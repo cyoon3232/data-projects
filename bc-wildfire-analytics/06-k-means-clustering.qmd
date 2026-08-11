@@ -1,0 +1,244 @@
+---
+title: K-Means Clustering
+execute:
+  output: false
+---
+
+```{r}
+#| label: load-packages
+
+library(tidyverse)
+library(tidymodels)
+library(patchwork)
+```
+
+```{r}
+#| label: load-data
+analysis_valid <- read_csv(
+  "data/processed/analysis_valid.csv",
+  show_col_types = FALSE
+)
+```
+
+---
+
+# Question
+*Are there distinct types of station days based on wildfire exposure and PM2.5 conditions?*
+
+
+## Setup
+
+```{r}
+cluster_data <- analysis_valid |>
+  filter(!is.na(nearest_fire_km_14d)) |>
+  select(
+    mean_pm25,
+    nearest_fire_km_14d,
+    fire_count_100km_7d,
+    fire_count_250km_14d
+  )
+```
+
+```{r}
+#| label: scale-data
+#| output: true
+
+cluster_data_scaled <- cluster_data |>
+  mutate(across(everything(), ~ log1p(.x))) |>
+  mutate(across(everything(), ~ as.numeric(scale(.x))))
+
+summary(cluster_data_scaled)
+```
+
+## Elbow Plot
+
+```{r}
+#| label: elbow-plot
+#| output: true
+set.seed(555555)
+
+k_values <- seq(from = 1, to = 100, by = 10)
+
+total_withinss <- map_dbl(
+  k_values,
+  ~ kmeans(cluster_data_scaled, centers = .x, nstart = 20)$tot.withinss
+)
+
+elbow_data <- tibble(k = k_values, total_withinss = total_withinss)
+
+elbow_plot <- elbow_data |>
+  ggplot(aes(x = k, y = total_withinss)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = k_values) +
+  labs(
+    title = "Elbow Plot for K-Means Clustering",
+    subtitle = "Selecting the number of station-day clusters",
+    x = "Number of Clusters (K)",
+    y = "Total Within-Cluster Sum of Squares"
+  ) +
+  theme_minimal()
+elbow_plot
+ggsave("figures/06_elbow_plot_1.png", plot = elbow_plot)
+```
+
+```{r}
+#| label: elbow-data-2
+#| output: true
+set.seed(555555)
+
+k_values_2 <- seq(from = 1, to = 11, by = 1)
+
+total_withinss_2 <- map_dbl(
+  k_values_2,
+  ~ kmeans(cluster_data_scaled, centers = .x, nstart = 20)$tot.withinss
+)
+
+elbow_data_2 <- tibble(k = k_values_2, total_withinss = total_withinss_2)
+
+elbow_plot_2 <- elbow_data_2 |>
+  ggplot(aes(x = k, y = total_withinss)) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = k_values_2) +
+  labs(
+    title = "Zoomed to 1 to 11",
+    x = "Number of Clusters (K)",
+    y = "Total Within-Cluster Sum of Squares"
+  ) +
+  theme_minimal()
+
+elbow_plot_2
+
+ggsave("figures/06_elbow_plot_2.png", plot = elbow_plot_2)
+```
+
+After log-transforming and standardizing the clustering variables, the elbow plot showed a clearer bend around K = 4. The bend was vague around 3 and 4 but since the reduction from the left of 4 was more sustantial than the right, four clusters were selected.
+
+## Fit K-Means with K = 4
+
+```{r}
+#| label: final-kmeans
+#| output: true
+
+set.seed(555555)
+
+final_kmeans <- kmeans(
+  cluster_data_scaled,
+  centers = 4,
+  nstart = 50
+)
+
+# How many observations ended up in each cluster
+table(final_kmeans$cluster)
+```
+
+Join the original data and the cluster label.
+```{r}
+#| label: cluster-label-to-original
+
+# Add cluster label variable to original data
+cluster_results <- cluster_data |>
+  mutate(cluster = factor(final_kmeans$cluster))
+
+cluster_results |> head()
+```
+
+## Cluster Summary
+
+- Mean of daily mean PM2.5
+- Mean and median of nearest fire in km within 14 days
+- Mean and median of number of fires within 100km in the recent 7 days
+- Mean and median of number of fires within 250km in the recent 14 days
+
+```{r}
+#| label: cluster-summary
+#| output: true
+
+cluster_summary <- cluster_results |>
+  group_by(cluster) |>
+  summarise(
+    station_days = n(),
+
+    cluster_mean_pm25 = mean(mean_pm25),
+    cluster_median_pm25 = median(mean_pm25),
+
+    mean_nearest_fire_km = mean(nearest_fire_km_14d),
+    median_nearest_fire_km = median(nearest_fire_km_14d),
+
+    mean_fire_count_100km_7d = mean(fire_count_100km_7d),
+    median_fire_count_100km_7d = median(fire_count_100km_7d),
+
+    mean_fire_count_250km_14d = mean(fire_count_250km_14d),
+    median_fire_count_250km_14d = median(fire_count_250km_14d),
+
+    .groups = "drop"
+  )
+
+print(cluster_summary, width = Inf)
+```
+
+Observing the data:  
+Cluster 1 has a moderate distance to fires with the nearest fire being 147 km and median of 2 fires.  
+Cluster 2 has a close distance to fires with the nearest fire being 68.9 and have a lot of fires within 250km on average having a median of 5.  
+Cluster 3 has a high mean and median of PM2.5 but nearly no fires within 100 km.  
+Cluster 4 is far from fires or have minimal fire activity; also has low PM2.5.
+
+```{r}
+#| label: define-clusters
+# Naming clusters
+cluster_results <- cluster_results |>
+  mutate(
+    station_day_cluster = recode(
+      cluster,
+      `1` = "Moderately distanced fire activity",
+      `2` = "Close & high fire activity",
+      `3` = "High PM2.5 with broader fire activity",
+      `4` = "Distant or minimal fire activity"
+    ),
+    
+    station_day_cluster = factor(
+      station_day_cluster,
+      levels = c(
+        "Distant or minimal fire activity",
+        "Moderately distanced fire activity",
+        "Close & high fire activity",
+        "High PM2.5 with broader fire activity"
+      )
+    )
+  )
+```
+
+## Final Cluster Visualization
+
+```{r}
+#| label: cluster-visualization
+#| output: true
+
+cluster_plot <- cluster_results |>
+  ggplot(aes(x = nearest_fire_km_14d, y = mean_pm25, color = station_day_cluster)) +
+  geom_point(alpha = 0.25) +
+  labs(
+    title = "Station-Day Clusters by Fire Proximity and PM2.5",
+    subtitle = "Four-cluster K-means solution",
+    x = "Distance to nearest recent large fire (km)",
+    y = "Daily mean PM2.5 (µg/m³)",
+    color = "Station-day cluster"
+  ) +
+  theme_minimal()
+
+cluster_plot_zoomed <- cluster_plot +
+  coord_cartesian(xlim = c(0, 900), ylim = c(0, 50)) +
+  labs(
+    title ="",
+    subtitle = "Zoomed view of common station-day conditions"
+  )
+
+cluster_plot / cluster_plot_zoomed
+```
+
+# Conclusion
+
+K-means identified four distinct patterns based on PM2.5 concentration and recent wildfire occurrence nearby. One cluster represents distant or minimal fire activity, having low concentrations of PM2.5. Another contains close and numerous recent fires with quite high PM2.5 concentrations. However, the cluster with the highest PM2.5 is not associate to have the closest fire, showing that either distance and fire counts alone do not explain all PM2.5 conditions, or we must expand further in terms of distance.
+
+Therefore, the clustering results support the broader finding that wildfire proximity is associated with PM2.5 but that is not consistent and other environment factors likely play crucial roles.

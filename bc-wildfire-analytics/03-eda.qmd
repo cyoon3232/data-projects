@@ -1,0 +1,729 @@
+---
+title: "Exploratory Data Analysis"
+execute:
+  output: false
+---
+
+Eplores daily PM2.5 patterns in British Columbia from 2022–2024 and their relationship with recent large-fire activity.
+
+```{r}
+#| label: load-packages
+
+# load packages
+library(tidyverse)
+library(patchwork)
+```
+
+```{r}
+#| label: load-data
+
+# load processed analysis data
+analysis_daily <- read_csv(
+  "data/processed/analysis_daily.csv",
+  show_col_types = FALSE)
+
+# filter to only valid ones
+analysis_valid <- analysis_daily |> filter(valid_day)
+
+# load large fires data
+large_fires_clean <- read_csv(
+  "data/processed/large_fires_clean.csv",
+  show_col_types = FALSE
+)
+
+case_study_fires <- read_csv(
+  "data/processed/case_study_fires.csv",
+  show_col_types = FALSE
+)
+```
+
+The table below summarizes the most important variables used throughout the data-building and analysis workflow.
+
+```{r}
+#| label: variable-reference
+#| echo: false
+#| output: true
+variable_reference <- tibble(
+  `Air Quality` = c(
+    "Station_Date",
+    "Year",
+    "Month",
+    "NAPS_ID",
+    "Station_Name",
+    "Latitude",
+    "Longitude",
+    "mean_pm25",
+    "max_pm25",
+    "hours_observed",
+    "valid_day",
+    "Month_Name" # EDA
+  ),
+
+  Fire = c(
+    "Fire_ID",
+    "Fire_Year",
+    "Report_Date",
+    "Fire_Date",
+    "Fire_Latitude",
+    "Fire_Longitude",
+    "Size_Ha",
+    "Cause",
+    "Response",
+    "",
+    "",
+    ""
+  ),
+
+  Relationship = c(
+    "days_since_fire",
+    "Distance_km",
+    "fire_count_100km_{7/14/30}d",
+    "fire_count_250km_{7/14/30}d",
+    "fire_area_250km_{7/14/30}d",
+    "nearest_fire_km_{7/14/30}d",
+    # EDA
+    "recent_fire_250km_14d",    # TRUE/FALSE
+    "fire_activity_250km_14d",  # 0-6+ four fire classes
+    "fire_distance_group ",      # four distance classes
+    "",
+    "",
+    ""
+  )
+)
+
+knitr::kable(
+  variable_reference,
+  caption = "Key variables used throughout the analysis",
+  na = ""
+)
+```
+
+---
+
+# 1. How did daily PM2.5 differ between 2022, 2023, and 2024?
+
+### Review Summary
+```{r}
+#| label: summary-analysis-daily
+#| output: true
+
+analysis_valid |>
+  group_by(Year) |>
+  summarise(
+    station_days = n(),
+    mean_daily_pm25 = mean(mean_pm25),
+    median_daily_pm25 = median(mean_pm25),
+    q75_daily_pm25 = quantile(mean_pm25, 0.75),
+    max_daily_pm25 = max(mean_pm25),
+    .groups = "drop"
+  )
+```
+
+2023 has the highest mean, the highest median by a slight amount, and a slightly lower 75th percentile. The mean of 7.29 is very high compared 6.57 of 2022 and 5.2 of 2024. Thissuggests the upper tail of 2023 contains really high PM2.5 like in Kamloops and Fort St. John.
+
+### Quantify the Upper Tail
+```{r}
+#| label: pm25-upper-tail-by-year
+#| output: true
+
+analysis_valid |>
+  group_by(Year) |>
+  summarise(
+    median_pm25 = median(mean_pm25),
+    p75_pm25 = quantile(mean_pm25, 0.75),
+    p90_pm25 = quantile(mean_pm25, 0.90),
+    p95_pm25 = quantile(mean_pm25, 0.95),
+    p99_pm25 = quantile(mean_pm25, 0.99),
+    max_pm25 = max(mean_pm25),
+    .groups = "drop"
+  )
+```
+
+Through the 90th percentile, 2022 and 2023 have nearly identical values but then 2023 become larger from the 95th. Then it has a very high maximum of 596 compared to ones in 2022 and 2024, which are 209 and 319 respectively.
+
+This supports the previous hypothesis that 2023's higher yearly mean is driven by very high upper tail values.
+
+### Visualization 1: Yearly Box Plot
+```{r}
+#| label: pm25-boxplot-year
+#| fig-cap: "Distribution of valid daily mean PM2.5 concentrations by year. The lower plot zooms to 0–30 µg/m^3."
+#| output: true
+
+pm25_boxplot <- analysis_valid |>
+  ggplot(aes(x = factor(Year), y = mean_pm25)) +
+  geom_boxplot() +
+  labs(
+    title = "Daily Mean PM2.5 Distribution by Year",
+    subtitle = "Valid station-days in British Columbia, 2022–2024",
+    x = "Year",
+    y = "Daily mean PM2.5 (µg/m^3)"
+  ) +
+  theme_minimal()
+
+pm25_boxplot_zoomed <- analysis_valid |>
+  ggplot(aes(x = factor(Year), y = mean_pm25)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 30)) +
+  labs(
+    subtitle = "Zoomed to 0–30 µg/m^3",
+    x = "Year",
+    y = "Daily mean PM2.5 (µg/m^3)"
+  ) +
+  theme_minimal()
+
+pm25_boxplot / pm25_boxplot_zoomed
+```
+
+Daily PM2.5 was right-skewed in all three years; the means were greater than medians. 2023 had the highest mean of daily PM2.5, while its median and 75th percentile were relatively similar to 2022. This suggests that some station days have unusually high concentrations, leading to the increase in the 2023 mean.
+
+By examination of wildfires near the high values, we may find a correlation.
+
+# 2. When during the year are PM2.5 levels higher?
+
+```{r}
+#| label: add-month-label
+
+analysis_valid <- analysis_valid |>
+  mutate(Month_Name = factor(month.abb[Month], levels = month.abb))
+```
+
+Calculate monthly summaries separately for each year.
+```{r}
+#| label: monthly-pm25-summary
+#| output: true
+monthly_pm25 <- analysis_valid |>
+  group_by(Year, Month, Month_Name) |>
+  summarise(
+    station_days = n(),
+    monthly_mean_pm25 = mean(mean_pm25),
+    monthly_median_pm25 = median(mean_pm25),
+    monthly_p90_pm25 = quantile(mean_pm25, 0.90),
+    monthly_p95_pm25 = quantile(mean_pm25, 0.95),
+    monthly_max_pm25 = max(mean_pm25),
+    .groups = "drop"
+  )
+monthly_pm25
+```
+
+
+## 2-1. What did a typical station day look like that month?
+
+```{r}
+#| label: monthly-median-pm25
+#| fig-cap: "Line graph of a typical valid daily mean PM2.5 by month."
+#| output: true
+
+monthly_median_plot <- monthly_pm25 |>
+  ggplot(aes(x = Month, y = monthly_median_pm25, group = factor(Year), color = factor(Year))) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = 1:12, labels = month.abb) +
+  labs(
+    title = "Visualization 2: Typical Daily PM2.5 by Month",
+    subtitle = "Monthly median of station day mean PM2.5",
+    x = "Month",
+    y = "Median daily PM2.5 (µg/m^3)",
+    color = "Year"
+  ) +
+  theme_minimal()
+
+monthly_median_plot
+```
+
+Typical daily PM2.5 showed seasonal differences that varied by year. In all three years, the concentration was lower during spring. In 2022, the median increased sharply in the fall and peaked around October-November. In 2023, the line rose the most in late summer with August having the highest median. Compared to other two years, 2024 generally remained low increasing around the same point as 2023, late Summer, and peaking in August.
+
+Overall, every year has a particular season that is more concentrated than others, but that season is not identical every year. 2022 was around Aug-Nov while 2023 and 2024 were around Jul-Aug.
+
+## 2-2. How high were the upper-tail station days that month?
+
+```{r}
+#| label: monthly-p90-pm25
+#| fig-cap: "Line graph of upper-tail valid daily mean PM2.5 by month."
+#| output: true
+
+monthly_p90_plot <- monthly_pm25 |>
+  ggplot(aes(x = Month, y = monthly_p90_pm25, group = factor(Year), color = factor(Year))) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = 1:12, labels = month.abb) +
+  labs(
+    title = "Visualization 3: 90th Percentile Daily PM2.5 by Month",
+    x = "Month",
+    y = "90th percentile PM2.5 µg/m^3)",
+    color = "Year"
+  ) +
+  theme_minimal()
+
+monthly_p90_plot
+```
+
+Upper-tail PM2.5 varied dramatically among the three years. August 2023 is very noticeable with its median value at a point far above any values. In 2022, the upper tail was highest during September-November. In 2024, the upper tail was generally lower and more stable.
+
+## Combined Observation
+Seasonal differences are strong in highly concentrated PM2.5 station-days than in typical ones.
+
+# 3. Does large fire activity have similar seasonality?
+
+## 3-1. How many large-fire records occurred in each month of each year?
+```{r}
+#| label: monthly-fire-summary
+#| output: true
+
+monthly_fires <- large_fires_clean |>
+  filter(!is.na(Fire_Date)) |>
+  mutate(
+    Year = lubridate::year(Fire_Date),
+    Month = lubridate::month(Fire_Date)
+  ) |>
+  count(Year, Month, name = "large_fire_count") |>
+  tidyr::complete(
+    Year = 2022:2024,
+    Month = 1:12,
+    fill = list(large_fire_count = 0)
+  ) |>
+  mutate(Month_Name = factor(month.abb[Month], levels = month.abb))
+
+monthly_fires |> slice_head(n = 10)
+```
+
+## 3-2. When during the year were large fires most frequently recorded?
+
+```{r}
+#| output: true
+monthly_fire_plot <- monthly_fires |>
+  ggplot(aes(x = Month, y = large_fire_count, group = factor(Year), color = factor(Year))) +
+  geom_line() +
+  geom_point() +
+  scale_x_continuous(breaks = 1:12, labels = month.abb) +
+  labs(
+    title = "Visualization 4: Large Fire Records by Month",
+    x = "Month",
+    y = "Number of large-fire records",
+    color = "Year"
+  ) +
+  theme_minimal()
+
+monthly_fire_plot
+```
+
+
+## Comparing
+
+```{r}
+#| fig-width: 15
+#| fig-height: 4
+#| output: true
+
+
+(
+  monthly_median_plot + labs(title = "Median PM2.5", subtitle = "") | 
+  monthly_p90_plot + labs(title = "90th Percentile PM2.5") | 
+  monthly_fire_plot + labs(title = "Large Fire Activities")
+) +
+  plot_annotation(
+    title = "Visualization 5: Comparing Median and 90th Percentile PM2.5 with Numer of Large Fire Activites"
+  )
+```
+
+Large-fire activity and upper-tail PM2.5 show some temporal overlap. Large-fire records show a sharp rise in July 2023 close to the sharp peak of 90th percentile PM2.5 record in August 2023. However, this relationship is not consistent over years. In 2022, large-fire records show a peak around August while the highest point of upper-tail PM2.5 occurred later in September-November. In 2024, large-fire activity peaked in July but PM2.5 increased moderately in August.
+
+Therefore, monthly fire counts and high-PM2.5 periods have a weak relationship that cannot be fully explained only by the two. We will need to look into geographic and other factors.
+
+# 4. Do stations near more recent fires have higher PM2.5?
+
+### Recent fire counts with `fire_count_250km_14d`
+
+```{r}
+#| label: recent-fire-count-distribution
+#| output: true
+
+analysis_valid |>
+  count(fire_count_250km_14d, sort = TRUE)
+
+analysis_valid |>
+  summarise(
+    min_fires = min(fire_count_250km_14d),
+    median_fires = median(fire_count_250km_14d),
+    mean_fires = mean(fire_count_250km_14d),
+    max_fires = max(fire_count_250km_14d),
+    percent_zero = mean(fire_count_250km_14d == 0) * 100
+  )
+```
+
+78% zero shows this variable, fire_count_250km_14d, is zero-heavy.
+
+The fire-activity will be categorized by recent-fire counts. Each category will get a PM2.5 distribution. This is to answer the question above, do station days experiencing more recent nearby large-fire activity tend to have higher mean daily PM2.5?
+
+### Choosing the fire count categories
+
+```{r}
+#| label: nonzero-fire-count
+#| output: true
+
+analysis_valid |>
+  filter(fire_count_250km_14d > 0) |>
+  count(
+    fire_count_250km_14d
+  ) |>
+  arrange(fire_count_250km_14d) |>
+  head()
+
+analysis_valid |>
+  filter(fire_count_250km_14d > 0) |>
+  count(
+    fire_count_250km_14d
+  ) |>
+  arrange(desc(fire_count_250km_14d)) |>
+  head()
+
+analysis_valid |>
+  filter(fire_count_250km_14d > 0) |>
+  summarise(
+    min = min(fire_count_250km_14d),
+    q25 = quantile(fire_count_250km_14d, 0.25),
+    median = median(fire_count_250km_14d),
+    q75 = quantile(fire_count_250km_14d, 0.75),
+    p90 = quantile(fire_count_250km_14d, 0.90),
+    p95 = quantile(fire_count_250km_14d, 0.95),
+    max = max(fire_count_250km_14d)
+  )
+```
+
+## 4-1. Are PM2.5 concentrations generally different when there has been at least one recent large fire within 250 km?
+
+```{r}
+#| label: recent-fire-exist-difference
+#| output: true
+
+# classify if the fire is within 250km in recent 14 days
+analysis_valid <- analysis_valid |>
+  mutate(
+    recent_fire_250km_14d =
+      if_else(
+        fire_count_250km_14d > 0,
+        "At least one recent fire",
+        "No recent fire"
+      )
+  )
+
+# distribution
+analysis_valid |>
+  group_by(recent_fire_250km_14d) |>
+  summarise(
+    station_days = n(),
+    fire_mean_pm25 = mean(mean_pm25),
+    fire_median_pm25 = median(mean_pm25),
+    fire_p90_pm25 = quantile(mean_pm25, 0.90),
+    fire_p95_pm25 = quantile(mean_pm25, 0.95),
+    .groups = "drop"
+  )
+```
+
+The four fire count categories will be as following: 0 fires, 1 fire, 2-5 fires, 6+ fires. The biggest populated number after 0 is 1 and 2-5 covers 75% of the data. Then 6+ captures the upper quarter.
+
+```{r}
+#| label: recent-nearby-large-fire-boxplot
+#| fig-cap: "Difference when at least one fire activity exists"
+#| output: true
+recent_near_fire_boxplot <- analysis_valid |>
+  ggplot(aes(x = recent_fire_250km_14d, y = mean_pm25)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 40)) +
+  labs(
+    title = "Visualization 6: Daily Mean PM2.5 by Recent Nearby Large-Fire Activity",
+    subtitle = "Large fires within 250 km in recent 14 days",
+    x = NULL,
+    y = "Daily mean PM2.5 (µg/m^3)"
+  ) +
+  theme_minimal()
+
+recent_near_fire_boxplot
+```
+
+Station days with at least one large fire within 250km during the previous 14 days tended to have higher daily PM2.5 than station days none. Though the difference is small around the median, the distribution with fir activity has a larger upper qudrant. This shows that recent near fires may be more associated with high-PM2.5 records than just typical conditions.
+
+## 4-2. How much recent large-fire activity occurred within 250 km and what did its PM2.5 look like?
+
+```{r}
+#| label: add-four-fire-categories
+#| output: true
+analysis_valid <- analysis_valid |>
+  mutate(
+    fire_activity_250km_14d = case_when(
+      fire_count_250km_14d == 0 ~ "0 fires",
+      fire_count_250km_14d == 1 ~ "1 fire",
+      fire_count_250km_14d <= 5 ~ "2–5 fires",
+      fire_count_250km_14d >= 6 ~ "6+ fires"
+    ),
+    
+    fire_activity_250km_14d = factor(
+      fire_activity_250km_14d,
+      levels = c(
+        "0 fires",
+        "1 fire",
+        "2–5 fires",
+        "6+ fires"
+      )
+    )
+  )
+
+analysis_valid |>
+  count(fire_activity_250km_14d)
+```
+
+
+```{r}
+#| label: fire-activity-summary-4-categories
+fire_activity_summary <- analysis_valid |>
+  group_by(fire_activity_250km_14d) |>
+  summarise(
+    station_days = n(),
+    fire_mean_pm25 = mean(mean_pm25),
+    fire_median_pm25 = median(mean_pm25),
+    fire_p90_pm25 = quantile(mean_pm25, 0.90),
+    fire_p95_pm25 = quantile(mean_pm25, 0.95),
+    .groups = "drop"
+  )
+
+fire_activity_summary
+```
+
+```{r}
+#| label: fire-four-category-boxplot
+#| output: true
+fire_activity_boxplot_full <- analysis_valid |>
+  ggplot(aes(x = fire_activity_250km_14d, y = mean_pm25)) +
+  geom_boxplot() +
+  labs(
+    title = "Visualization 7: Daily PM2.5 by Recent Nearby Large-Fire Activity",
+    subtitle = "Large fires within 250 km during the previous 14 days",
+    x = "Recent large-fire activity",
+    y = "Daily mean PM2.5 (µg/m^3)"
+  ) +
+  theme_minimal()
+
+fire_activity_boxplot_zoomed <- analysis_valid |>
+  ggplot(aes(x = fire_activity_250km_14d, y = mean_pm25)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 40)) +
+  labs(
+    title = "Zoomed to 0–40 µg/m^3",
+    x = "Recent large-fire activity",
+    y = "Daily mean PM2.5 µg/m^3"
+  ) +
+  theme_minimal()
+
+fire_activity_boxplot_full / fire_activity_boxplot_zoomed
+```
+
+Daily mean PM2.5 generally increased with recent nearby large-fire activity. Mean PM2.5 rose from 5.62 µg/m^3 with no recent fires to 11.3 µg/m^3 with 6+ fires. However, the medians did not increase perfectly across every category. These observations indicate that the relationship is rather driven by high upper-tail PM2.5 data than a shift in the entire distribution.
+
+---
+
+# 5. Does distance to a recent large fire matter?
+
+The data that will be used:
+```{r}
+#| label: distance-data
+distance_data <- analysis_valid |>
+  filter(!is.na(nearest_fire_km_14d))
+```
+
+```{r}
+#| label: nearest-fire-distance-summary
+#| output: true
+
+distance_data |>
+  summarise(
+    min_distance = min(nearest_fire_km_14d),
+    q25_distance = quantile(nearest_fire_km_14d, 0.25),
+    median_distance = median(nearest_fire_km_14d),
+    q75_distance = quantile(nearest_fire_km_14d, 0.75),
+    p90_distance = quantile(nearest_fire_km_14d, 0.90),
+    max_distance = max(nearest_fire_km_14d)
+  )
+
+nrow(distance_data)
+```
+
+Again, classifying distances: <= 100 km, 100-250 km, 250-500 km, >500 km.
+
+```{r}
+#| label: add-four-distance-category
+#| output: true
+distance_data <- distance_data |>
+  mutate(
+    fire_distance_group = case_when(
+      nearest_fire_km_14d <= 100 ~ "<=100 km",
+      nearest_fire_km_14d <= 250 ~ "100–250 km",
+      nearest_fire_km_14d <= 500 ~ "250–500 km",
+      TRUE ~ ">500 km"
+    ),
+
+    fire_distance_group = factor(
+      fire_distance_group,
+      levels = c(
+        "<=100 km",
+        "100–250 km",
+        "250–500 km",
+        ">500 km"
+      )
+    )
+  )
+
+distance_data |>
+  count(fire_distance_group)
+```
+
+```{r}
+#| label: summary-distance-fire
+#| output: true
+distance_summary <- distance_data |>
+  group_by(fire_distance_group) |>
+  summarise(
+    station_days = n(),
+    distance_mean_pm25 = mean(mean_pm25),
+    distance_median_pm25 = median(mean_pm25),
+    distance_p90_pm25 = quantile(mean_pm25, 0.90),
+    distance_p95_pm25 = quantile(mean_pm25, 0.95),
+    .groups = "drop"
+  )
+
+distance_summary
+```
+
+Daily PM2.5 decreased as the distance to the nearest fire increased; they have a negative relationship. Mean PM2.5 dclined from appx. 11.8 µg/m^3 when the nearest fire was within 100km to 4.09 µg/m^3 when it was more than 500km away. Median PM2.5 showed the same pattern. This observation shows a clear correlation between closer recent large-fire activity and higher daiily PM2.5, but not causation.
+
+```{r}
+#| label: distance-four-categories-boxplot
+#| output: true
+distance_boxplot_full <- distance_data |>
+  ggplot(aes(x = fire_distance_group, y = mean_pm25)) +
+  geom_boxplot() +
+  labs(
+    title = "Visualization : Daily PM2.5 by Distance to Nearest Recent Large Fire",
+    subtitle = "Nearest large fire reported during the previous 14 days",
+    x = "Distance to nearest recent large fire",
+    y = "Daily mean PM2.5 (µg/m^3)"
+  ) +
+  theme_minimal()
+
+distance_boxplot_zoomed <- distance_data |>
+  ggplot(aes(x = fire_distance_group, y = mean_pm25)) +
+  geom_boxplot() +
+  coord_cartesian(ylim = c(0, 40)) +
+  labs(
+    title = "Zoomed to 0–40 µg/m^3",
+    x = "Distance to nearest recent large fire",
+    y = "Daily mean PM2.5 (µg/m^3)"
+  ) +
+  theme_minimal()
+
+distance_boxplot_full / distance_boxplot_zoomed
+```
+
+---
+
+# Case Studies
+
+Using Kamloops - August 21, 2023 and Fort St. John - May 19, 2023
+
+## Kamloops
+
+```{r}
+#| label: kamloops-data
+#| output: true
+
+# check Kamloops - Aug 21, 2023 data
+analysis_valid |>
+  filter(
+    Station_Date == as.Date("2023-08-21"),
+    str_detect(Station_Name, "KAMLOOPS")
+  ) |>
+  select(
+    Station_Date,
+    Station_Name,
+    mean_pm25,
+    max_pm25,
+    fire_count_100km_7d,
+    fire_count_100km_14d,
+    fire_count_250km_7d,
+    fire_count_250km_14d,
+    nearest_fire_km_7d,
+    nearest_fire_km_14d
+  )
+
+# show the fires within 250km and 14 days
+case_study_fires |>
+  filter(
+    Station_Date == as.Date("2023-08-21"),
+    str_detect(Station_Name, "KAMLOOPS")
+  ) |>
+  arrange(Distance_km) |>
+  select(
+    Fire_ID,
+    Fire_Date,
+    days_since_fire,
+    Size_Ha,
+    Distance_km
+  )
+```
+
+The station recorded a daily mean PM2.5 of 596 µg/m^3 and an hourly maximum of 982 µg/m^3. Six large fires were located within 250 km of the station in the recent 14 days to date. The nearest was appx. 96 km away, even more two were within 100 km and seven days.
+
+## Fort St. John
+
+```{r}
+#| label: fortstjohn-data
+#| output: true
+
+# check Fort St. John - May 19, 2023 data
+analysis_valid |>
+  filter(
+    Station_Date == as.Date("2023-05-19"),
+    str_detect(Station_Name, "FORT ST. JOHN")
+  ) |>
+  select(
+    Station_Date,
+    Station_Name,
+    mean_pm25,
+    max_pm25,
+    fire_count_100km_7d,
+    fire_count_100km_14d,
+    fire_count_250km_7d,
+    fire_count_250km_14d,
+    nearest_fire_km_7d,
+    nearest_fire_km_14d
+  )
+
+# show the fires within 250km and 14 days
+case_study_fires |>
+  filter(
+    Station_Date == as.Date("2023-05-19"),
+    str_detect(Station_Name, "FORT ST. JOHN")
+  ) |>
+  arrange(Distance_km) |>
+  select(
+    Fire_ID,
+    Fire_Date,
+    days_since_fire,
+    Size_Ha,
+    Distance_km
+  )
+```
+
+The station recorded a daily mean PM2.5 of 461 µg/m^3 and an hourly maximum of 2112 µg/m^3. Four large fires occurred within the 250 km and in 14 day window. The nearest was appx. 30 km away, while two were within 100 km during the previous 14 days.
+
+Overall, both extreme events case studies consistently align with the association we observed about recent-near fires and high PM2.5.
+
+---
+
+# EDA Conclusion
+
+- Daily PM2.5 was strongly right-skewed, especially 2023 had extreme upper-tail concentrations
+- Seasonal patterns differed between years; high-PM2.5 periods partly coincided with periods of greater large-fire activity
+- Fires recent to observed date and near station shows a clear correlation
+  - Mean daily PM2.5 increased from 5.62 µg/m^3 to 11.3 µg/m^3 when station had fires within 250 km to the station.
+  - Mean and median PM2.5 increased as the fire activity grew near.
+
+

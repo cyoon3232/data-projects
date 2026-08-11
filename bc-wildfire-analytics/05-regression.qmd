@@ -1,0 +1,432 @@
+---
+title: Regressions
+execute:
+  output: false
+---
+
+```{r}
+#| label: load-packages
+
+library(tidyverse)
+library(tidymodels)
+library(patchwork)
+```
+
+```{r}
+#| lable: load-data-and-seed
+set.seed(555555)
+
+analysis_valid <- read_csv(
+  "data/processed/analysis_valid.csv",
+  show_col_types = FALSE
+)
+```
+
+---
+
+# Question 1 - KNN Regression
+
+*Among station days with a recently reported large fire, can fire proximity and recent fire activity be used to predict daily mean PM2.5?*
+
+
+## Predictors
+
+- nearest_fire_km_14d: how close was the nearest recent fire?
+- fire_count_100km_7d: how much very nearby and very recent fires were there?
+- fire_count_250km_14d: how much broader nearby fire activity was there?
+
+This covers proximity, very local + very recent activities, and broader fire activities.
+
+In other words it is essentially asking: *Which historical station days had a similar combination of nearest fire distance, nearby recent fire count, and broader recent fire count, and what PM2.5 did those days experience?*
+
+```{r}
+#| label: reg-pred
+#| output: true
+regression_data <- analysis_valid |>
+  select(
+    mean_pm25,
+    nearest_fire_km_14d,  
+    fire_count_100km_7d,
+    fire_count_250km_14d
+  )
+
+# Check for NA values
+regression_data |> summarise(across(everything(), ~ sum(is.na(.x))))
+
+# filter NA values in nearest_fire_km_14d
+nrow(regression_data)
+
+regression_data <- analysis_valid |>
+  filter(!is.na(nearest_fire_km_14d))
+
+nrow(regression_data)
+```
+
+### Will regression work better
+Classification threw away a lot of information making data analysis limited. However, regression retains the numerical data as is. Although this does not guarantee a good model, it seems to be better-fit for regression.
+
+### Problem that might rise
+Our target is extremely right-skewed and that may lead to a very large RMSE.
+
+Plus, the predictors are still zero-heavy and the nearest fire in km within recent 14 days have many missing values. Due to lack of data, the regression might become unreliable.
+
+---
+
+## KNN Regression
+
+### Training and testing sets
+```{r}
+#| label: regression-split
+
+set.seed(555555)
+
+pm25_reg_split <- initial_split(regression_data, prop = 0.75)
+
+pm25_reg_train <- training(pm25_reg_split)
+pm25_reg_test <- testing(pm25_reg_split)
+
+# Check
+nrow(pm25_reg_train)
+nrow(pm25_reg_test)
+```
+
+### Recipe
+
+```{r}
+#| label: regon-recipe
+pm25_reg_recipe <- recipe(mean_pm25 ~ nearest_fire_km_14d + fire_count_100km_7d + fire_count_250km_14d, data = pm25_reg_train) |>
+  step_scale(all_predictors()) |>
+  step_center(all_predictors())
+```
+
+### Five-fold cross-validation
+
+```{r}
+#| label: reg-cross-validation
+set.seed(555555)
+
+pm25_reg_vfold <- vfold_cv(pm25_reg_train, v = 5)
+```
+
+### KNN regression model
+
+```{r}
+#| label: knn-regression-model
+
+knn_reg_spec <- nearest_neighbor(weight_func = "rectangular", neighbors = tune()) |>
+  set_engine("kknn") |>
+  set_mode("regression")
+```
+
+### Workflow
+
+```{r}
+#| label: reg-workflow
+pm25_reg_workflow <- workflow() |>
+  add_recipe(pm25_reg_recipe) |>
+  add_model(knn_reg_spec)
+```
+
+### Tune K
+
+First Try
+
+```{r}
+#| label: tune-knn-reg
+k_reg_values <- tibble(neighbors = seq(from = 1, to = 51, by = 2))
+
+set.seed(555555)
+
+# tuning results
+# pm25_reg_results <- pm25_reg_workflow |>
+#  tune_grid(
+#    resamples = pm25_reg_vfold,
+#    grid = k_reg_values,
+#    metrics = metric_set(rmse, mae, rsq)
+#  )
+
+# saving loaded data
+# saveRDS(
+#  pm25_reg_results,
+#  "data/processed/pm25_knn_regression_tuning.rds"
+# )
+
+# load previously saved data
+pm25_reg_results <- readRDS("data/processed/pm25_knn_regression_tuning.rds")
+```
+
+```{r}
+#| label: rmse
+#| output: true
+regression_rmse <- pm25_reg_results |>
+  collect_metrics() |>
+  filter(.metric == "rmse")
+
+head(regression_rmse)
+
+best_reg_k <- regression_rmse |>
+  arrange(mean) |>
+  slice(1) |>
+  pull(neighbors)
+
+best_reg_k
+```
+
+```{r}
+#| label: regression-k-visualization
+#| output: true
+
+best_reg_k_point <- regression_rmse |>
+  filter(neighbors == best_reg_k)
+
+rmse_vs_k <- regression_rmse |>
+  ggplot(aes(x = neighbors, y = mean)) +
+  geom_line() +
+  geom_point() +
+  geom_point(data = best_reg_k_point, size = 3) +
+  labs(
+    title = "Cross-Validation RMSE Across K Values",
+    subtitle = "KNN regression using 5-fold cross-validation",
+    x = "Number of Neighbours (K)",
+    y = "RMSE"
+  ) +
+  theme_minimal()
+
+rmse_vs_k
+```
+
+```{r}
+#| label: tune-knn-reg-2
+#| echo: false
+k_reg_vals_refined <- tibble(neighbors = 4:10)
+
+set.seed(555555)
+
+# tuning results
+# pm25_reg_results_refined <- pm25_reg_workflow |>
+#  tune_grid(
+#    resamples = pm25_reg_vfold,
+#    grid = k_reg_vals_refined,
+#    metrics = metric_set(rmse, mae, rsq)
+#  )
+
+# saving loaded data
+# saveRDS(
+#   pm25_reg_results_refined, 
+#   "data/processed/pm25_knn_regression_tuning_refined.rds"
+# )
+
+# load previously saved data
+pm25_reg_results_refined <- readRDS("data/processed/pm25_knn_regression_tuning_refined.rds")
+```
+
+```{r}
+#| label: rmse-2
+#| output: true
+#| echo: false
+regression_rmse_refined <- pm25_reg_results_refined |>
+  collect_metrics() |>
+  filter(.metric == "rmse")
+
+best_reg_k_refined <- regression_rmse_refined |>
+  arrange(mean) |>
+  slice(1) |>
+  pull(neighbors)
+
+best_reg_k_refined
+```
+
+```{r}
+#| label: regression-k-visualization-2
+#| output: true
+#| echo: false
+
+best_reg_k_point_2 <- regression_rmse_refined |>
+  filter(neighbors == best_reg_k_refined)
+
+rmse_vs_k_refined <- regression_rmse_refined |>
+  ggplot(aes(x = neighbors, y = mean)) +
+  geom_line() +
+  geom_point() +
+  geom_point(data = best_reg_k_point_2, size = 3) +
+  labs(
+    title = "Zoomed in on 4 to 10",
+    subtitle = "KNN regression using 5-fold cross-validation",
+    x = "Number of Neighbours (K)",
+    y = "RMSE"
+  ) +
+  theme_minimal()
+
+rmse_vs_k_refined
+```
+In the broader graph, cross-validation RMSE decreased shraply as K increased from 1 reaching its lowest region around K = 4 to 10. RMSE, while slowly increasing, stabilized for larger K values.
+
+A refined search around K = 4 to 10  region identified K = 6 as the best value for the KNN regression model. Cross-validation RMSE decreased to it minimum at K = 6 and increased toward smaller and larger values.
+
+### Final KNN Regression
+
+```{r}
+#| label: final-knn-regression
+# Final KNN model
+final_knn_reg_spec <- nearest_neighbor(weight_func = "rectangular", neighbors = best_reg_k_refined) |>
+  set_engine("kknn") |>
+  set_mode("regression")
+
+final_pm25_reg_workflow <- workflow() |>
+  add_recipe(pm25_reg_recipe) |>
+  add_model(final_knn_reg_spec)
+
+final_knn_reg_fit <- final_pm25_reg_workflow |>
+  fit(data = pm25_reg_train)
+```
+
+```{r}
+#| label: test-knn-regression
+#| output: true
+# Test
+pm25_reg_predictions <- predict(final_knn_reg_fit, pm25_reg_test) |>
+  bind_cols(pm25_reg_test)
+
+pm25_reg_predictions |> head()
+```
+
+Metrics
+
+- RMSE: Calculates prediction error. Lower the better.
+- R^2: How much of the variation the model explains. Higher the better (0-1)
+- MAE: Calculates average absolute error. Lower the better.
+
+```{r}
+#| label: reg-metrics
+#| output: true
+# RMSE, R^2, MAE values
+knn_reg_metrics <- pm25_reg_predictions |>
+  metrics(truth = mean_pm25, estimate = .pred)
+
+knn_reg_metrics
+```
+
+```{r}
+#| label: knn-regression-predicted-vs-actual
+#| fig-height: 5
+#| fig-width: 12
+#| output: true
+
+predicted_actual_plot <- pm25_reg_predictions |>
+  ggplot(aes(x = mean_pm25, y = .pred)) +
+  geom_point(alpha = 0.3) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  labs(
+    title = "KNN Regression: Predicted vs Actual Daily PM2.5",
+    subtitle = paste("Final model with K =", best_reg_k_refined),
+    x = "Actual daily mean PM2.5 (µg/m^3)",
+    y = "Predicted daily mean PM2.5 (µg/m^3)"
+  ) +
+  theme_minimal()
+
+predicted_actual_zoomed <- pm25_reg_predictions |>
+  ggplot(aes(x = mean_pm25, y = .pred)) +
+  geom_point(alpha = 0.3) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed") +
+  coord_cartesian(xlim = c(0, 30), ylim = c(0, 30)) +
+  labs(
+    title = "KNN Regression: Predicted vs Actual Daily PM2.5",
+    subtitle = "Zoomed to 0–30 µg/m^3",
+    x = "Actual daily mean PM2.5 (µg/m^3)",
+    y = "Predicted daily mean PM2.5 (µg/m^3)"
+  ) +
+  theme_minimal()
+
+predicted_actual_plot | predicted_actual_zoomed
+```
+
+## Analysis
+MAE = 4.42  
+This means the predictions differ from the actual daily mean PM2.5 by about 4.42 µg/m^3 on average.
+
+RMSE = 10.5   
+Being much larger than MAE suggests that there are some very large predictions errors. This can be found in the Predicted vs Actual plot where most observations are clustered near 0-30 but it doesn't predict for the extreme PM2.5 values of 100+.
+
+R^2 = 0.156  
+The model explains about 15.6% of the variation in daily mean PM2.5. So proximity and recent fire counts did contain some useful information but most PM2.5 variation remains unexplained.
+
+Thus, the regression model captured some relationship between recent wildfire conditions and daily PM2.5 but it has limitations. It particularly tends to greatly underpredict the extreme PM2.5 events.
+
+---
+
+# Question 2 - Linear Regression
+*Does the more flexible KNN model outperform a simple linear relationship using the same wildfire predictors?*
+
+## Predictors
+Keep the same.
+
+---
+
+## Linear Regression
+
+```{r}
+#| label: linear-regression
+#| output: true
+# without tuning
+linear_reg_spec <- linear_reg() |>
+  set_engine("lm")
+
+linear_reg_recipe <- recipe(
+  mean_pm25 ~
+    nearest_fire_km_14d +
+    fire_count_100km_7d +
+    fire_count_250km_14d,
+  data = pm25_reg_train
+)
+
+linear_reg_workflow <- workflow() |>
+  add_recipe(linear_reg_recipe) |>
+  add_model(linear_reg_spec)
+
+linear_reg_fit <- linear_reg_workflow |>
+  fit(data = pm25_reg_train)
+
+# predict
+linear_reg_predictions <- predict(linear_reg_fit, pm25_reg_test) |>
+  bind_cols(pm25_reg_test)
+
+linear_reg_metrics <- linear_reg_predictions |>
+  metrics(truth = mean_pm25, estimate = .pred)
+
+linear_reg_metrics
+```
+
+---
+
+# KNN vs. Linear Regression
+
+```{r}
+#| label: comparison-table
+#| output: true
+#| echo: false
+model_comparison <- tibble(
+  Model = c("KNN Regression", "Linear Regression"),
+  RMSE = c(
+    knn_reg_metrics |> filter(.metric == "rmse") |> pull(.estimate),
+    linear_reg_metrics |> filter(.metric == "rmse") |> pull(.estimate)
+  ),
+  MAE = c(
+    knn_reg_metrics |> filter(.metric == "mae") |> pull(.estimate),
+    linear_reg_metrics |> filter(.metric == "mae") |> pull(.estimate)
+  ),
+  R_squared = c(
+    knn_reg_metrics |> filter(.metric == "rsq") |> pull(.estimate),
+    linear_reg_metrics |> filter(.metric == "rsq") |> pull(.estimate)
+  )
+)
+
+model_comparison |>
+  knitr::kable(
+    digits = 3,
+    caption = "Comparison of KNN and linear regression test performance"
+  )
+```
+
+The KNN and linear regression models show very similarly limited predictive performance. Linear regression had a slightly lower RMSE (10.3 µg/m^3; KNN 10.5 µg/m^3), while KNN had a lower MAE (4.42 µg/m^3; linear 4.82 µg/m^3) and a higher R^2 (0.156; linear 0.106). This indicates that KNN captured more variation and differ less from the actual value compared to linear, suggesting that wildfire and PM2.5 relationship is not strictly linear.
+
+Nevertheless, both models were barely able to explain the overall variation. Therefore, the fire proximity and fire coutns alone are insufficient for accurate PM2.5 prediction.

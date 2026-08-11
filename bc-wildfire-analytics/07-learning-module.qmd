@@ -1,0 +1,239 @@
+---
+title: "Learning Module: Auditing Code"
+execute:
+  warning: false
+  message: false
+---
+
+This is a learning module derived from the two common mistakes I made across the files. It includes importance of going over tedious steps to verify the code works as intended and to validate the data in any datasets. (Includes AI Auditing)
+
+```{r}
+#| label: load-packages
+
+library(tidyverse)
+```
+
+```{r}
+#| label: load-data
+
+analysis_daily <- read_csv("data/processed/analysis_daily.csv")
+
+large_fires_clean <- read_csv("data/processed/large_fires_clean.csv", show_col_types = FALSE)
+```
+
+### Learning Objectives
+By the end of this module, learners should be able to:
+
+- distinguish bewtween code that **runs** and code that produces a **correct result**
+- validate processed data against known observations
+- identify inconsistencies in apparently complete data
+- critically audit AI-generated or AI-assisted `
+
+---
+
+# Acitivty 1: No Missing Values = Correct?
+
+Suppose the wildfire dataset contains a `Report_Date` variable.
+
+Lets first check whether the variable contains missing values (NA).
+
+```{r}
+#| label: report-date-missing
+#| output: true
+
+large_fires_clean |>
+  summarise(
+    missing_report_dates = sum(is.na(Report_Date))
+  )
+```
+
+There are no missing report dates.
+
+### Question 1
+Does this make it a reliable variable?
+
+::: {.callout-tip}
+
+### Hint
+A value can exist in a data set and still be inconsistent with other information.
+
+Try comparing the `Fire_Year` for the fire with the year contained in `Report_Date`.
+:::
+
+### Check Consistency
+
+This code checks if any `Fire_Year` conflicts with the year in the `Report_Date`, which should be the same.
+
+```{r}
+#| label: audit-fire-date-consistency
+#| output: true
+
+large_fires_clean |>
+  filter(Fire_Year != lubridate::year(Report_Date)) |>
+  select(
+    Fire_ID,
+    Fire_Year,
+    Report_Date,
+    Fire_Date,
+    Date_Status
+  )
+```
+
+Few records contain disagreement between the fire year and report date.
+
+
+::: {.callout-note}
+
+### Guided Answer
+
+Having zero mssing values shows that the variable is **complete** but it doesn't verify its **validity** or **consistency**.
+
+Values should always be compared to related variables and if necessary, to external official sources.
+:::
+
+---
+
+## AI Audit 1
+
+An AI assistant says: `Out_Date` has no missing values, so it is safe to use directly to predictions.
+
+What is wrong with the reasoning?
+
+
+::: {.callout-note}
+
+### Guided Answer
+
+The AI checked **completeness** but did not check **correctness**.
+
+A better audit:
+1. checking missing values
+2. comparing `Fire_Out_Year` with the year in `Out_Date`
+3. investigating inconsistent records
+5. documenting corrections and unresolved records
+:::
+
+
+---
+
+# Activity 2: Code Runs, but is it Correct?
+Suppose hourly PM2.5 measurements are being summarized into one row per monitoring station per day. (Currently, each monitoring station per day holds appx. 24 hourly PM2.5 measurements.)
+
+We want to calculate:
+
+- mean_pm25: average hourly PM2.5 concentration
+- max_pm25: maximum hourly PM2.5 concentration
+
+AI assistant suggests the following code:
+
+```{r}
+#| eval: false
+
+summarise(
+  mean_pm25 = mean(Concentration, na.rm = TRUE),
+  max_pm25 = mean(Concentration, na.rm = TRUE)
+)
+```
+
+The code executes without producing an error.
+
+### Question 1
+Is the code correct?
+
+In other words, does the code work as intended?
+
+::: {.callout-tip}
+
+Hint: think about the calculation used for `mean_pm25` and `max_pm25`.
+
+:::
+
+### Question 2
+What change should be made to the code?
+
+
+::: {.callout-note}
+
+### Guidied Answer
+`max_pm25` should use `max()` rather than `mean()`
+
+```{r}
+#| eval: false
+summarise(
+  mean_pm25 = mean(Concentration, na.rm = TRUE),
+  max_pm25 = max(Concentration, na.rm = TRUE)
+)
+```
+
+The original is syntactically valid - reason it works. The mistake was in the logic. Usually, this is a common mistake that occurs when copy and pasting similar looking lines.
+:::
+
+## Validate Against a Known Observation
+
+One useful way: compare it with a known observation from the raw dataset.
+
+During first exploration, it was noted that the Fort St. John station recorded a high hourly PM2.5 maximum of 2112 µg/m^3 on May 19, 20223.
+
+Given the processed dataset:
+
+```{r}
+#| label: validate-fort-st-john
+#| output: true
+
+analysis_daily |>
+  filter(
+    Station_Date == as.Date("2023-05-19"),
+    str_detect(Station_Name, "FORT ST. JOHN")
+  ) |>
+  select(
+    Station_Date,
+    Station_Name,
+    mean_pm25,
+    max_pm25
+  )
+```
+
+The daily mean and hourly maximum should be different. If `max_pm25` were equal to `mean_pm25`, that means the aggregation code needs to be inspected.
+
+
+::: {.callout-important}
+### Key Lesson
+**Successful execution does not gurantee a correct analysis**
+
+- Check whether calculated values agree with known original observations
+:::
+
+---
+
+## AI Audit 2
+Imagine a code was generated by an AI tool.
+
+Which response is the safest?  
+A. Trust the code because it ran error-free.  
+B. Trust the code because the variable is named `max_pm25`  
+C. Check whether the functions used actually match the intended calculations and validate the output against known observations.  
+D. Remove unusually large PM2.5 values as they may be errors.   
+
+
+::: {.callout-note}
+
+### Guided Answer
+
+**C**
+
+Successful execution does not prove the code works as intended.
+
+Always check the logic and compare outputs with previously known data.
+:::
+
+---
+
+# Self-Assessment
+Always verify data analysis result when there has been a change. Ask yourself:
+
+- Did the code execute successfully?
+- Does each function work as intended?
+- Do the results make sense? (For example, width of a table is negative)
+- Can this output be compared to a known obervation?
+- Are variables consistent with other related variables?
+- If AI helped generate code, did you verify?

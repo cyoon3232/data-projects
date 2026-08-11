@@ -1,0 +1,993 @@
+---
+title: "Build Analysis Dataset"
+bibliography: references.bib
+link-citations: true
+execute:
+    output: false
+---
+
+Transforms the raw datasets to processed ones.
+
+```{r}
+#| label: load
+library(tidyverse)
+library(geosphere)
+```
+
+The table below summarizes the most important variables used throughout the data-building and analysis workflow.  
+
+```{r}
+#| label: variable-reference
+#| echo: false
+#| output: true
+variable_reference <- tibble(
+  `Air Quality` = c(
+    "Station_Date",
+    "NAPS_ID",
+    "Station_Name",
+    "Latitude",
+    "Longitude",
+    "mean_pm25",
+    "max_pm25",
+    "hours_observed",
+    "valid_day"
+  ),
+
+  Fire = c(
+    "Fire_ID",
+    "Fire_Year",
+    "Report_Date",
+    "Fire_Date",
+    "Fire_Latitude",
+    "Fire_Longitude",
+    "Size_Ha",
+    "Cause",
+    "Response"
+  ),
+
+  Relationship = c(
+    "days_since_fire",
+    "Distance_km",
+    "fire_count_100km_{7/14/30}d",
+    "fire_count_250km_{7/14/30}d",
+    "fire_area_250km_{7/14/30}d",
+    "nearest_fire_km_{7/14/30}d",
+    "",
+    "",
+    ""
+  )
+)
+
+knitr::kable(
+  variable_reference,
+  caption = "Key variables used throughout the analysis",
+  na = ""
+)
+```
+
+# Prepare Air Quality Data
+
+First, load data.
+
+```{r}
+#| label: load-air-quality-data
+pm25_2022 <- read_csv(
+  "data/raw/airquality/2022/data_2022.csv",
+  show_col_types = FALSE)
+
+stations_2022 <- read_csv(
+  "data/raw/airquality/2022/stations_2022.csv",
+  show_col_types = FALSE)
+
+pm25_2023 <- read_csv(
+  "data/raw/airquality/2023/data_2023.csv",
+  show_col_types = FALSE)
+
+stations_2023 <- read_csv(
+  "data/raw/airquality/2023/stations_2023.csv",
+  show_col_types = FALSE)
+
+pm25_2024 <- read_csv(
+  "data/raw/airquality/2024/data_2024.csv",
+  show_col_types = FALSE)
+
+stations_2024 <- read_csv(
+  "data/raw/airquality/2024/stations_2024.csv",
+  show_col_types = FALSE)
+```
+
+Second, select station data columns.
+
+```{r}
+#| label: select-station-columns
+
+station_columns <- c(
+  "NAPS_ID",
+  "Station_Name",
+  "City",
+  "Latitude",
+  "Longitude",
+  "Elevation_m",
+  "Site_Type",
+  "Urbanization",
+  "Land_Use",
+  "AQMS_Airzone"
+)
+
+station_info_2022 <- stations_2022 |>
+  select(all_of(station_columns))
+
+station_info_2023 <- stations_2023 |>
+  select(all_of(station_columns))
+
+station_info_2024 <- stations_2024 |>
+  select(all_of(station_columns))
+```
+
+Third, join station and pm25 data by year.
+
+```{r}
+#| label: join-station-data
+
+# join each year and add Year column
+pm25_2022_joined <- pm25_2022 |>
+    left_join(station_info_2022, by = "NAPS_ID") |>
+    mutate(Year = 2022)
+
+pm25_2023_joined <- pm25_2023 |>
+    left_join(station_info_2023, by = "NAPS_ID") |>
+    mutate(Year = 2023)
+
+pm25_2024_joined <- pm25_2024 |>
+    left_join(station_info_2024, by = "NAPS_ID") |>
+    mutate(Year = 2024)
+pm25_2022_joined
+```
+
+Last, combine all years.
+
+```{r}
+#| label: combine-years
+
+pm25_joined <- bind_rows(
+    pm25_2022_joined,
+    pm25_2023_joined,
+    pm25_2024_joined
+)
+glimpse(pm25_joined)
+pm25_joined |> count(Year)
+```
+
+Verification.
+```{r}
+#| label: verify-join-row-counts
+#| output: true
+
+tibble(
+    Year = c(2022, 2023, 2024),
+    Before_Join = c(
+        nrow(pm25_2022),
+        nrow(pm25_2023),
+        nrow(pm25_2024)
+    ),
+    After_Join = c(
+        nrow(pm25_2022_joined),
+        nrow(pm25_2023_joined),
+        nrow(pm25_2024_joined)
+    )
+)
+```
+
+Before_Join and After_Join values are equal, verifying that the joining worked as intended.
+
+### Valid Days
+
+Environment and Climate Change Canada considers a PM2.5 daily 24-hour average valid when at least 75% of the hourly measurements (18 to 24) are available [@ecccAirQuality2026]. Therefore, station-days with fewer than 18 observed hours are retained for data-quality tracking but their daily PM2.5 sumaries are treated as missing.
+
+- hours_observed: number of non-missing hourly readings
+- mean_pm25: daily 24-hour average
+- max_pm25: largest observed hourly concentration of the day
+- Station_Date: change name of Date_yyyy_mm_dd
+- Month: separate month
+- valid_day: TRUE or FALSE
+
+```{r}
+#| label: station-day
+pm25_daily <- pm25_joined |>
+  group_by(
+    Year,
+    Date_yyyy_mm_dd,
+    NAPS_ID,
+    Station_Name,
+    City,
+    Latitude,
+    Longitude,
+    Elevation_m,
+    Site_Type,
+    Urbanization,
+    Land_Use,
+    AQMS_Airzone
+  ) |>
+  summarise(
+    # collapse hourly observations
+    hours_observed = sum(!is.na(Concentration)), 
+
+    # collapse hourly observation of pm25 into a mean, max pm25 of the day
+    mean_pm25 = if (sum(!is.na(Concentration)) >= 18) {
+        mean(Concentration, na.rm=TRUE)
+    } else {
+        NA_real_
+    },
+    max_pm25 = if (sum(!is.na(Concentration)) >= 18) {
+        max(Concentration, na.rm=TRUE)
+    } else {
+        NA_real_
+    },
+    .groups = "drop"
+  )
+
+pm25_daily <- pm25_daily |>
+    rename(
+        Station_Date = Date_yyyy_mm_dd
+    ) |>
+    mutate(Month = lubridate::month(Station_Date), valid_day = hours_observed >= 18)
+
+glimpse(pm25_daily)
+pm25_daily |> count(Year, valid_day)
+```
+
+Do not filter valid_day = FALSE as this is still useful information.
+
+```{r}
+#| output: true
+# percent
+pm25_daily |>
+  group_by(Year) |>
+  summarise(
+    station_days = n(),
+    valid_days = sum(valid_day),
+    invalid_days = sum(!valid_day),
+    percent_valid = mean(valid_day) * 100,
+    .groups = "drop"
+  )
+```
+
+### Hours Observed
+```{r}
+#| label: hour-observed-distribution
+#| output: true
+pm25_daily_hours_observed <- pm25_daily |>
+    count(hours_observed) |>
+    arrange(desc(hours_observed))
+
+pm25_daily |> 
+    ggplot(aes(x = hours_observed)) +
+    geom_bar() +
+    scale_x_continuous(breaks = 0:24) +
+    labs(
+      title = "Figure 1: Distribution of Hours Observed",
+      x = "Hours Observed",
+      y = "Count"
+    ) +
+    geom_vline(xintercept = 17.5, linetype = "dashed") +
+    theme_minimal()
+```
+
+---
+
+# Prepare Wildfire Data
+
+- Filter 2022-2024 BC
+- Don't use: ATTK_DATE, PRESCRIBED, FIRE_TYPE (+ unused: PROTZONE, etc.)
+- Inconsistent: OUT_DATE
+- Rename LATITUDE and LONGITUDE since it is also in stations
+- Recode N,H,U in CAUSE22 and FUL,MOD,MON in RESPONSE
+- REP_DATE show only date and not time for usage
+
+First, load.
+```{r}
+#| label: load-large-fires-data
+
+large_fires <- read_csv(
+  "data/raw/wildfire/NFDB_point_large_fires.txt",
+  col_types = cols(ATTK_DATE = col_datetime()))
+glimpse(large_fires)
+```
+
+Second, clean.
+```{r}
+#| label: clean-large-fires-data
+
+large_fires_clean <- large_fires |>
+  filter(
+    SRC_AGENCY == "BC",
+    YEAR %in% 2022:2024
+  ) |>
+  mutate(
+    Fire_Year = YEAR,
+    Report_Date = as.Date(REP_DATE),
+    Report_Year = lubridate::year(Report_Date),
+    Cause = recode(
+      CAUSE22,
+      "N" = "Natural",
+      "H" = "Human",
+      "U" = "Unknown"
+    ),
+    Response = recode(
+      RESPONSE,
+      "FUL" = "Full",
+      "MOD" = "Modified",
+      "MON" = "Monitor"
+    )
+  ) |>
+  select(
+    Fire_ID = NFDBFIREID,
+    Fire_Year,
+    Report_Date,
+    Report_Year,
+    Fire_Latitude = LATITUDE,
+    Fire_Longitude = LONGITUDE,
+    Size_Ha = SIZE_HA,
+    Cause,
+    Response
+  )
+glimpse(large_fires_clean)
+```
+Now, it went from 24 variables to 9 variables.
+
+Third, verify.
+```{r}
+#| output: true
+summary(large_fires_clean$Size_Ha)
+
+large_fires_clean |>
+  count(Fire_Year, Report_Year)
+```
+
+Size_Ha result matches the one from exploration. From the result, we find that there are 4 rows disagreeing on the year.
+
+### Resolving conflicting data
+
+```{r}
+#| output: true
+large_fires_clean |>
+  filter(Fire_Year != Report_Year) |>
+  select(
+    Fire_ID,
+    Fire_Year,
+    Report_Date,
+    Report_Year,
+    Size_Ha,
+    Cause,
+    Response
+  )
+```
+
+- BC-2024-2024-G90228: Nogah Creek - May 5, 2024 [@bcwsG90228]
+- BC-202402024-G90399: CAN'T FIND
+- BC-2024-2024-G90777: (Unverified source) Burn severity report, 2024
+- BC-2024-2024-G90207: Party Creek - May 2, 2024 [@bcwsG90207]
+
+*Important: Not to overwrite Report_Date; instead, create a new variable: Fire_Date
+
+
+```{r}
+# two fire dates identified, two fire given NA
+large_fires_clean <- large_fires_clean |>
+  mutate(
+    Fire_Date = case_when(
+      Fire_ID == "BC-2024-2024-G90228" ~ as.Date("2024-05-05"),
+      Fire_ID == "BC-2024-2024-G90207" ~ as.Date("2024-05-02"),
+
+      Fire_ID %in% c("BC-2024-2024-G90399", "BC-2024-2024-G90777") ~ as.Date(NA),
+
+      TRUE ~ Report_Date
+    )
+  )
+
+# add Date_Status to indicate the corrected and unresolved ones
+large_fires_clean <- large_fires_clean |>
+  mutate(
+    Date_Status = case_when(
+      Fire_ID %in% c("BC-2024-2024-G90228", "BC-2024-2024-G90207") ~ "Verified correction",
+      Fire_ID %in% c("BC-2024-2024-G90399", "BC-2024-2024-G90777") ~ "Unresolved",
+      TRUE ~ "Original"
+    )
+  )
+
+glimpse(large_fires_clean)
+```
+
+With this addition of variables, the total became 11.
+
+Previously, since it had no missing values, REP_DATE was assumed to be a reliable field. Yet, this showed that everything needs to be heeded to carefully, including validity and consistency.
+
+```{r}
+#| label: last-verification
+#| output: true
+large_fires_clean |>
+  count(Date_Status)
+
+large_fires_clean |>
+  summarise(
+    usable_temporal_records = sum(!is.na(Fire_Date)),
+    unusable_temporal_records = sum(is.na(Fire_Date))
+  )
+```
+
+---
+
+# Spatial-Distance Calculations
+
+Using both the PM2.5 joined data (pm25_daily) and large wildfires data (large_fires_clean)
+
+## 1. Checking
+Check that the station's coordinates does not change.
+```{r}
+#| label: check-station-coordinates
+#| output: true
+
+station_coordinate_check <- pm25_daily |>
+  distinct(NAPS_ID, Latitude, Longitude) |>
+  count(NAPS_ID, name = "coordinate_versions") |>
+  filter(coordinate_versions > 1)
+
+station_coordinate_check
+```
+
+The result confirms that the each station's coordinates did not change.
+
+For this, going to use geosphere.   
+*Important: geosphere expects coordinates in c(Longitude, Latitude) order
+
+## 2. Take station locations from Air Quality data
+
+Extract station ID, name, city, and location coordinates.
+```{r}
+#| label: station-locations
+#| output: true
+
+station_locations <- pm25_daily |>
+  distinct(
+    NAPS_ID,
+    Station_Name,
+    City,
+    Latitude,
+    Longitude
+  )
+
+glimpse(station_locations)
+nrow(station_locations)
+```
+
+Across the three years, there were stations that only appear in only one or two years.
+
+## 3. Make every station/fire pair
+```{r}
+#| label: usable-temporal-fire-data
+# create a dataframe of only usable data
+large_fires_temporal <- large_fires_clean |>
+  filter(!is.na(Fire_Date))
+
+glimpse(large_fires_temporal)
+```
+
+AI was used to suggest using `tidyr::crossing()` to do cartesian product.
+```{r}
+#| label: station-fire-pairs
+# use cartesian product
+station_fire_pairs <- tidyr::crossing(
+  station_locations,
+  large_fires_temporal |>
+    select(
+      Fire_ID,
+      Fire_Date,
+      Fire_Latitude,
+      Fire_Longitude,
+      Size_Ha
+    )
+)
+glimpse(station_fire_pairs)
+```
+Results in 10 variables and 22,800 data.
+
+### AI Audit
+
+What I want:  
+Station A | data  
+Station A | data  
+Station A | data  
+...(until it runs through large_fires_temporal rows)   
+Station B | data  
+...(same thing)  
+
+This means that each station is associated with all the data in large_fires_temporal. Thus, the following MUST BE TRUE:
+```{r}
+#| output: true
+nrow(station_fire_pairs) == nrow(station_locations) * nrow(large_fires_temporal)
+```
+
+### 4. Calculate distance
+
+**AI disclosure:** ChatGPT was used to suggest using `geosphere::distHarversine` for geographic distance calculation. The function's behaviour and assumptions were verified using geosphere documentations [@geosphere2026].
+```{r}
+#| label: station-fire-distances
+
+station_fire_distances <- station_fire_pairs |>
+  mutate(
+    Distance_km =
+      geosphere::distHaversine(
+        cbind(Longitude, Latitude),
+        cbind(Fire_Longitude, Fire_Latitude)
+      ) / 1000
+  )
+```
+
+### AI-Audit
+
+Latitude and longitude represent angular geographic coordinates rather than distances in kilometres. Therefore, directly calculating Euclidean distance from differences in latitude and longitude cannot work.  
+
+distHaversine() function calculates the shortest distance between two points. It also accepts longitude and latitude coordinates and calculate spherically [@geosphere2026]. Ex. distHarversine(c(0,0), c(90,90)). It returns the distance in metres which is the reason for /1000 to convert to kilometres.
+
+Try a known value: following must be 111.3 km.
+
+```{r}
+#| output: true
+geosphere::distHaversine(
+  c(0, 0),
+  c(1, 0)
+) / 1000
+```
+```{r}
+#| output: true
+# check distances
+summary(station_fire_distances$Distance_km)
+
+station_fire_distances |>
+  arrange(Distance_km) |>
+  select(
+    NAPS_ID,
+    Station_Name,
+    Fire_ID,
+    Fire_Date,
+    Size_Ha,
+    Distance_km
+  ) |>
+  slice_head(n = 10)
+```
+
+---
+
+# Collapsing Fire Data
+
+## 1. Time filtering
+
+Checking if a fire have been active within 30 days of a PM2.5 data. If so, then register as a candidate.
+```{r}
+# calculates 30 days before Station_Date
+station_day_fire_candidates <- pm25_daily |>
+  mutate(Window_Start = Station_Date - lubridate::days(30))
+# check
+station_day_fire_candidates |>
+  slice_sample(n=5) |> 
+  select(Window_Start, Station_Date)
+```
+
+Join station_fire_distances and station_day_fire_candidates. Comparing variables of the two datasets:
+```{r}
+#| label: variable-comparison
+all_columns <- union(names(station_fire_distances), names(station_day_fire_candidates))
+
+data.frame(
+  station_fire_distances = ifelse(
+    all_columns %in% names(station_fire_distances),
+    all_columns,
+    NA
+  ),
+  station_day_fire_candidates = ifelse(
+    all_columns %in% names(station_day_fire_candidates),
+    all_columns,
+    NA
+  ),
+  existInBoth = all_columns %in% names(station_fire_distances) &
+                all_columns %in% names(station_day_fire_candidates)
+)
+```
+
+We are selecting `NAPS_ID`, `Fire_ID`, `Fire_Date`, `Size_Ha`, `Distance_km` from the station-fire distances dataframe. Then joining it when each of its data matches with each of the data in fire-candidates-to-station dataframe.
+
+The match is determined by the following conditions: 
+
+- NAPS_ID
+- if Fire_Date (in station-fire-dist) is over or equal to Window_Start (in fire-candidate) 
+- if Fire_Date (in station-fire-dist) is before or equal to Station_Date (in fire-candidate)
+
+```{r}
+station_day_fire_candidates <- station_day_fire_candidates |>
+  inner_join(
+    station_fire_distances |> 
+      select(NAPS_ID, Fire_ID, Fire_Date, Size_Ha, Distance_km),
+
+    by = join_by(
+      NAPS_ID, 
+      Window_Start <= Fire_Date, 
+      Station_Date >= Fire_Date
+    ),
+    relationship = "many-to-many" # since each station-day can have many fire
+  ) |>
+  mutate(days_since_fire = as.numeric(Station_Date - Fire_Date))
+
+glimpse(station_day_fire_candidates)
+```
+
+```{r}
+#| label: audit-temporal-join
+#| output: true
+
+summary(station_day_fire_candidates$days_since_fire)
+
+all(
+  station_day_fire_candidates$days_since_fire >= 0 &
+  station_day_fire_candidates$days_since_fire <= 30
+)
+```
+
+These verify that the `days_since_fire` falls between 0 to 30.
+
+### What does station_day_fire_candidates actually show?
+A data: one station-day paired with one fire reported in the previous 30 days
+
+For example, on the same date on the same station, there will be many fire associated with it.
+```{r}
+#| output: true
+station_day_fire_candidates |>
+  arrange(Station_Date, Station_Name) |>
+  select(Station_Date, Station_Name, Fire_ID, days_since_fire, Distance_km) |>
+  head()
+```
+
+Example of an extreme PM2.5 events (Kamloops case - found in file 01). It shows that there really was a cluster of large-fire reports during one period.
+```{r}
+#| echo: false
+station_day_fire_candidates |>
+  filter(
+    Station_Date == as.Date("2023-08-21"),
+    str_detect(Station_Name, "KAMLOOPS")
+  ) |>
+  arrange(Distance_km) |>
+  select(
+    Station_Date,
+    Station_Name,
+    Fire_ID,
+    Fire_Date,
+    days_since_fire,
+    Size_Ha,
+    Distance_km
+  ) |>
+  slice_head(n = 10)
+```
+
+```{r}
+#| label: kamloops-data-focus-aug-21
+#| output: true
+station_day_fire_candidates |>
+  filter(
+    Station_Date == as.Date("2023-08-21"),
+    str_detect(Station_Name, "KAMLOOPS")
+  ) |>
+  arrange(Distance_km) |>
+  transmute(
+    Fire_ID,
+    Fire_Date,
+    days_since_fire,
+    Size_Ha,
+    Distance_km = round(Distance_km, 1)
+  ) |>
+  slice_head(n = 10)
+```
+
+## 2. Aggregating fire features
+
+Currently, Kamloops station on August 21 might appear 20+ times because it can be paired with 20+ different fires. Instead, we want one data: Kamloops + 2023-0-21 to contain a SUMMARY of all relevant fires.
+
+### Classify
+First, create variables that classifies distances. When we ask: How many fires were within 100 km and 14 days?, we can answer simply.
+
+```{r}
+#| label: fire-window-indicators
+station_day_fire_candidates <- station_day_fire_candidates |>
+  mutate(
+    within_7_days = days_since_fire <= 7,
+    within_14_days = days_since_fire <= 14,
+    within_30_days = days_since_fire <= 30,
+
+    within_100_km = Distance_km <= 100,
+    within_250_km = Distance_km <= 250
+  )
+```
+Check if it works, must get TRUE for all.
+```{r}
+#| label: verify-fire-window-indicators
+#| output: true
+station_day_fire_candidates |>
+  summarise(
+    all_7_within_30 = all(!within_7_days | within_30_days),
+    all_14_within_30 = all(!within_14_days | within_30_days),
+    all_100_within_250 = all(!within_100_km | within_250_km)
+  )
+
+station_day_fire_candidates |>
+  summarise(
+    within_7_days = sum(within_7_days),
+    within_14_days = sum(within_14_days),
+    within_30_days = sum(within_30_days),
+
+    within_100_km = sum(within_100_km),
+    within_250_km = sum(within_250_km)
+  )
+```
+
+```{r}
+#| label: within-30-days-equal-to-row-count
+#| echo: false
+within_30_days_num <- station_day_fire_candidates |>
+  filter(within_30_days) |>
+  nrow()
+nrow(station_day_fire_candidates) == within_30_days_num
+```
+
+### Aggregate
+Second and importantly, collapse all these fire features into one row.
+```{r}
+#| label: aggregate-fire-features
+
+station_day_fire_features <- station_day_fire_candidates |>
+  group_by(NAPS_ID, Station_Date) |>
+  summarise(
+    # fire counts within 100 km
+    fire_count_100km_7d = sum(within_100_km & within_7_days),
+    fire_count_100km_14d = sum(within_100_km & within_14_days),
+    fire_count_100km_30d = sum(within_100_km & within_30_days),
+
+    # fire counts within 250 km
+    fire_count_250km_7d = sum(within_250_km & within_7_days),
+    fire_count_250km_14d = sum(within_250_km & within_14_days),
+    fire_count_250km_30d = sum(within_250_km & within_30_days),
+
+    # total size of nearby fires - for rough estimate of recently reported large-fire area nearby
+    fire_area_250km_7d = sum(Size_Ha[within_250_km & within_7_days]),
+    fire_area_250km_14d = sum(Size_Ha[within_250_km & within_14_days]),
+    fire_area_250km_30d = sum(Size_Ha[within_250_km & within_30_days]),
+
+    # nearest fire within each time window
+    nearest_fire_km_7d =
+      if (any(within_7_days)) {
+        min(Distance_km[within_7_days])
+      } else {
+        NA_real_
+      },
+    nearest_fire_km_14d =
+      if (any(within_14_days)) {
+        min(Distance_km[within_14_days])
+      } else {
+        NA_real_
+      },
+    nearest_fire_km_30d = min(Distance_km),
+
+    .groups = "drop"
+  )
+
+glimpse(station_day_fire_features)
+```
+```{r}
+#| label: run-station-day-fire-features
+#| output: true
+station_day_fire_features |>
+  arrange(desc(fire_count_250km_14d)) |>
+  slice_head(n = 10)
+```
+
+Last, verify. The following must show 0. 
+```{r}
+#| label: run-no-duplicate-station-date
+#| output: true
+station_day_fire_features |>
+  count(NAPS_ID, Station_Date) |>
+  filter(n > 1)
+```
+
+This confirms that each row is has a unique station ID and station observed date as we intended: NAPS_ID + STATION_DATE + Summary of fires.
+
+*Data Audit*  
+fire_area_ is not reliable for prediction. The area of fire is always changing but this value is not since CNFDB dataset gives one size for each fire.
+
+Auditing, following must all be TRUE.
+```{r}
+#| label: audit-fire-features
+#| output: true
+
+station_day_fire_features |>
+  summarise(
+    # count audit
+    count_100_dist_250 = all(fire_count_100km_14d <= fire_count_250km_14d),
+    count_7_days_14 = all(fire_count_250km_7d <= fire_count_250km_14d),
+    count_14_days_30 = all(fire_count_250km_14d <= fire_count_250km_30d),
+
+    # size audit
+    area_7_days_14 = all(fire_area_250km_7d <= fire_area_250km_14d),
+    area_14_days_30 = all(fire_area_250km_14d <= fire_area_250km_30d),
+
+    # nearest value must be either same or less with greater data including the same ones
+    nearest_30_days_14 = all(is.na(nearest_fire_km_14d) | nearest_fire_km_30d <= nearest_fire_km_14d)
+  )
+```
+
+---
+
+# Air Quality with Fire Features
+
+Remember we joined: air quality station_locations and fire data. Now, we want every air-quality station day data preserved.
+
+## Join the fire features to PM2.5
+```{r}
+#| label: join-fire-features
+
+analysis_daily <- pm25_daily |>
+  left_join(
+    station_day_fire_features,
+    by = c(
+      "NAPS_ID",
+      "Station_Date"
+    )
+  )
+
+glimpse(analysis_daily)
+```
+
+If no qualifying fires exist, fire_count_ and fire_area_ shouldn't be NA; it should be 0. Yet, nearest_fire_distance_ are still NA because if it is 0, it would mean the fire is located at the monitoring station.
+
+*AI Disclosure:* ChatGPT was used to find the code like `starts_with()` and `~ replace_na()`. It helped the code to be efficient as columns started with the same part and had to replace the same value: NA to 0.
+```{r}
+#| label: replace-na-0
+analysis_daily <- analysis_daily |>
+  mutate(
+    across(
+      starts_with("fire_count_"),
+      ~ replace_na(.x, 0L)
+    ),
+
+    across(
+      starts_with("fire_area_"),
+      ~ replace_na(.x, 0)
+    )
+  )
+```
+
+Auditing,
+```{r}
+#| label: audit-replace-na-0
+#| output: true
+
+# check that it didn't lose rows
+nrow(analysis_daily) == nrow(pm25_daily)
+
+# check that the number NA values is 0
+analysis_daily |>
+  summarise(
+    fire_count_ = sum(is.na(pick(starts_with("fire_count_")))),
+    fire_area_ = sum(is.na(pick(starts_with("fire_area_"))))
+  )
+  
+glimpse(analysis_daily)
+```
+
+Verified that no rows were lost (TRUE) and all NA values in fire_count_ and fire_area_ were replaced by 0.
+
+---
+
+# Real-World Cases
+
+We will be looking through two stations that had a very high PM2.5 in 2023.
+
+## Inspect the Kamloops & Fort St. John
+
+We already have data about them from our file 01. Compare to check that every data have been preserved.
+
+```{r}
+#| label: case-studies
+#| output: true
+
+# Fort St. John
+case_study_fires <- station_day_fire_candidates |>
+  filter(
+    (
+      Station_Date == as.Date("2023-08-21") &
+      str_detect(Station_Name, "KAMLOOPS")
+    ) |
+    (
+      Station_Date == as.Date("2023-05-19") &
+      str_detect(Station_Name, "FORT ST. JOHN")
+    )
+  ) |>
+  filter(
+    within_250_km,
+    within_14_days
+  ) |>
+  select(
+    Station_Date,
+    Station_Name,
+    Fire_ID,
+    Fire_Date,
+    days_since_fire,
+    Size_Ha,
+    Distance_km
+  )
+case_study_fires
+```
+
+### Audit: PM2.5 Daily Maximum
+**Error**: For Kamloops and Fort St. John stations, `max_pm25` are supposed to be 982 and 2112 as we found in file 01, but this data shows that they are 596 and 461 -- equal to the `mean_pm25`.
+
+Recalculating `max_pm25` and `mean_pm25` on raw-joined data (`pm25_joined`) showed that the raw data was preserved. Reviewing the aggregation code showed that `mean()` had accidentally been used for both variables -- a copy-past error. The `max_pm25` was corrected to use `max()`.
+
+**Important**: Always compare processed results againt known raw observations. Code may execute successfully but will not gurantee that correctness.
+
+
+## Validation
+
+### Kamloops Station
+For the validation, we will manually find out fire_count_250km_14d and compare with the actual value.
+
+```{r}
+#| label: manually-audit-kamloops-features
+#| output: true
+
+kamloops_manual_check <- station_day_fire_candidates |>
+  filter(
+    Station_Date == as.Date("2023-08-21"),
+    str_detect(Station_Name, "KAMLOOPS")
+  ) |>
+  summarise(
+    manual_count_250km_14d = sum(within_250_km & within_14_days),
+    manual_area_250km_14d = sum(Size_Ha[within_250_km & within_14_days]),
+    manual_nearest_fire_14d = min(Distance_km[within_14_days])
+  )
+
+kamloops_actual_values <- analysis_daily |>
+  filter(
+    Station_Date == as.Date("2023-08-21"),
+    str_detect(Station_Name, "KAMLOOPS")
+  ) |>
+  select(
+    fire_count_250km_14d,
+    fire_area_250km_14d,
+    nearest_fire_km_14d
+  )
+
+# manual
+kamloops_manual_check
+
+# actual
+kamloops_actual_values
+```
+
+They are the same; validated. Plus, we can see that the area value is quite high.
+
+---
+
+# Final Processed Data
+
+```{r}
+#| label: save-analysis-data
+
+write_csv(analysis_daily, "data/processed/analysis_daily.csv")
+
+analysis_valid <- analysis_daily |>
+  filter(valid_day)
+write_csv(analysis_valid, "data/processed/analysis_valid.csv")
+
+write_csv(large_fires_clean, "data/processed/large_fires_clean.csv")
+
+write_csv(case_study_fires, "data/processed/case_study_fires.csv")
+```
+
