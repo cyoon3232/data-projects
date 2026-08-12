@@ -2,7 +2,7 @@
 
 ## 🌐 View the Rendered Project
 
-[View the full Quarto website](https://cyoon3232.github.io/data-projects/02-build-analysis-data.html)
+[View the full Quarto website](https://cyoon3232.github.io/data-projects/)
 
 # About
 An R and Quarto data anlaysis project.
