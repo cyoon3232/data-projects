@@ -1,0 +1,23 @@
+# R
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# Quarto temporary/generated files
+.quarto/
+*_cache/
+*_files/
+*.html
+_site/
+**/*.quarto_ipynb
+
+# VS Code
+.vscode/
+
+# Operating system
+.DS_Store
+Thumbs.db
+
+# BC Wildfire Analytics - large raw datasets
+/bc-wildfire-analytics/data/raw/
