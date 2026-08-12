@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Exploring Data – Can’t Open Window On A Hot Summer Day</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-261e60fdf64a0e003ec2340fd2db30d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar docked quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01-explore-data.html">Data Exploration</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation docked overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Can’t Open Window On A Hot Summer Day</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Home</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01-explore-data.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Data Exploration</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02-build-analysis-data.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Building the Dataset</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03-eda.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Exploratory Analysis</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04-knn-classification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">KNN Classification</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-regression.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Regression</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-k-means-clustering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">K-Means Clustering</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-learning-module.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Learning Module</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#exploring-bc-air-quality-data" id="toc-exploring-bc-air-quality-data" class="nav-link active" data-scroll-target="#exploring-bc-air-quality-data">Exploring BC Air Quality Data</a>
+  <ul class="collapse">
+  <li><a href="#inspect-air-quality-datasets" id="toc-inspect-air-quality-datasets" class="nav-link" data-scroll-target="#inspect-air-quality-datasets">Inspect Air Quality Datasets</a>
+  <ul class="collapse">
+  <li><a href="#research" id="toc-research" class="nav-link" data-scroll-target="#research">Research</a></li>
+  </ul></li>
+  <li><a href="#joined-station-and-pm2.5" id="toc-joined-station-and-pm2.5" class="nav-link" data-scroll-target="#joined-station-and-pm2.5">Joined Station and PM2.5</a>
+  <ul class="collapse">
+  <li><a href="#how-much-is-pm2.5-data-missing" id="toc-how-much-is-pm2.5-data-missing" class="nav-link" data-scroll-target="#how-much-is-pm2.5-data-missing">1. How much is PM2.5 data missing?</a></li>
+  <li><a href="#pm2.5-concentration-distribution" id="toc-pm2.5-concentration-distribution" class="nav-link" data-scroll-target="#pm2.5-concentration-distribution">2. PM2.5 concentration distribution</a></li>
+  <li><a href="#are-pollutant-and-units-actually-constant" id="toc-are-pollutant-and-units-actually-constant" class="nav-link" data-scroll-target="#are-pollutant-and-units-actually-constant">3. Are Pollutant and Units actually constant?</a></li>
+  <li><a href="#missing-data-by-station" id="toc-missing-data-by-station" class="nav-link" data-scroll-target="#missing-data-by-station">4. Missing Data by Station</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#exploring-bc-wildfire-data" id="toc-exploring-bc-wildfire-data" class="nav-link" data-scroll-target="#exploring-bc-wildfire-data">Exploring BC Wildfire Data</a>
+  <ul class="collapse">
+  <li><a href="#inspect-data" id="toc-inspect-data" class="nav-link" data-scroll-target="#inspect-data">Inspect Data</a></li>
+  <li><a href="#bc-fires" id="toc-bc-fires" class="nav-link" data-scroll-target="#bc-fires">2022-2024 BC Fires</a></li>
+  </ul></li>
+  <li><a href="#explore-2022-2024-air-quality-data" id="toc-explore-2022-2024-air-quality-data" class="nav-link" data-scroll-target="#explore-2022-2024-air-quality-data">Explore 2022 &amp; 2024 Air Quality Data</a>
+  <ul class="collapse">
+  <li><a href="#inspect" id="toc-inspect" class="nav-link" data-scroll-target="#inspect">Inspect</a></li>
+  </ul></li>
+  <li><a href="#how-to-determine-whether-a-fire-was-relevant-to-pm2.5" id="toc-how-to-determine-whether-a-fire-was-relevant-to-pm2.5" class="nav-link" data-scroll-target="#how-to-determine-whether-a-fire-was-relevant-to-pm2.5">How to determine whether a fire was relevant to PM2.5?</a>
+  <ul class="collapse">
+  <li><a href="#using-out_date" id="toc-using-out_date" class="nav-link" data-scroll-target="#using-out_date">Using OUT_DATE</a></li>
+  <li><a href="#using-rep_date-only" id="toc-using-rep_date-only" class="nav-link" data-scroll-target="#using-rep_date-only">Using REP_DATE only</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a>
+  <ul class="collapse">
+  <li><a href="#air-quality-data" id="toc-air-quality-data" class="nav-link" data-scroll-target="#air-quality-data">Air Quality Data</a></li>
+  <li><a href="#large-fire-data" id="toc-large-fire-data" class="nav-link" data-scroll-target="#large-fire-data">Large Fire Data</a></li>
+  <li><a href="#analysis-design" id="toc-analysis-design" class="nav-link" data-scroll-target="#analysis-design">Analysis Design</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Exploring Data</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="exploring-bc-air-quality-data" class="level1">
+<h1>Exploring BC Air Quality Data</h1>
+<p>The hourly PM2.5 observations wer obtained from the National Air Pollution Surveillance (NAPS) Program <span class="citation" data-cites="ecccNAPS2026">(<a href="#ref-ecccNAPS2026" role="doc-biblioref">Environment and Climate Change Canada 2026</a>)</span>.</p>
+<section id="inspect-air-quality-datasets" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-air-quality-datasets">Inspect Air Quality Datasets</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>pm25_2023 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2023/data_2023.csv"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>stations_2023 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2023/stations_2023.csv"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(pm25_2023<span class="sc">$</span>NAPS_ID) <span class="co"># monitoring stations</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p><strong>data_2023.csv:</strong><br>
+Data has 481800 hourly PM2.5 observations across BC for 2023 (8 columns). Each row shows one PM2.5 concentration measurement, one monitoring station, one date, start, and end time.<br>
+* Important: NAPS_ID -&gt; can connect to stations_2023.csv</p>
+<p><strong>stations_2023.csv:</strong><br>
+Observations are recorded by <strong>55</strong> monitoring stations.<br>
+Useful fields out of 43:</p>
+<ul>
+<li>NAPS_ID<br>
+</li>
+<li>Station_Name<br>
+</li>
+<li>City<br>
+</li>
+<li>Latitude: will be used to calculate distances from nearby fires<br>
+</li>
+<li>Longitude: same as latitude<br>
+</li>
+<li>Elevation_m<br>
+</li>
+<li>Site_Type<br>
+</li>
+<li>Urbanization<br>
+</li>
+<li>Land_Use<br>
+</li>
+<li>AQMS_Airzone</li>
+</ul>
+<section id="research" class="level3">
+<h3 class="anchored" data-anchor-id="research">Research</h3>
+<p>Particulate Matter (PM) is a complex mix of solids and aerosols. PM2.5 describes the fine particulate matter that are 2.5 microns or less in diameter (PM2.5).</p>
+<p><strong>Ambient Air Quality Standard in BC:</strong><br>
+24-Hour Average: 25 µg/m^3<br>
+Annual: 8 µg/m^3 <span class="citation" data-cites="bcPM25Objectives2026">(<a href="#ref-bcPM25Objectives2026" role="doc-biblioref">Government of British Columbia 2026</a>)</span></p>
+</section>
+</section>
+<section id="joined-station-and-pm2.5" class="level2">
+<h2 class="anchored" data-anchor-id="joined-station-and-pm2.5">Joined Station and PM2.5</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># check that the number and IDs of monitoring stations match</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(stations_2023)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(stations_2023<span class="sc">$</span>NAPS_ID)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">anti_join</span>(</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  pm25_2023 <span class="sc">|&gt;</span> <span class="fu">distinct</span>(NAPS_ID),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  stations_2023 <span class="sc">|&gt;</span> <span class="fu">distinct</span>(NAPS_ID),</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">"NAPS_ID"</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>station_info_2023 <span class="ot">&lt;-</span> stations_2023 <span class="sc">|&gt;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    NAPS_ID,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    Station_Name,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    City,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    Latitude,</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    Longitude,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    Elevation_m,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    Site_Type,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    Urbanization,</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    Land_Use,</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    AQMS_Airzone</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(station_info_2023)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="ot">&lt;-</span> pm25_2023 <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(station_info_2023, <span class="at">by =</span> <span class="st">"NAPS_ID"</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(pm25_2023_joined) <span class="co"># result should have 10+8-1=17 columns</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="how-much-is-pm2.5-data-missing" class="level3">
+<h3 class="anchored" data-anchor-id="how-much-is-pm2.5-data-missing">1. How much is PM2.5 data missing?</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_rows =</span> <span class="fu">n</span>(),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_concentration =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Concentration)),</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>27,784 rows missing concentration (5.77%)</p>
+</section>
+<section id="pm2.5-concentration-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="pm2.5-concentration-distribution">2. PM2.5 concentration distribution</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pm25_2023_joined<span class="sc">$</span>Concentration)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>    Min.  1st Qu.   Median     Mean  3rd Qu.     Max.      NAs 
+   0.000    2.000    5.000    7.321    8.000 2112.000    27784 </code></pre>
+</div>
+</div>
+<p>Max of 2112 is very big compared to others.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Concentration)) <span class="sc">|&gt;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Concentration)) <span class="sc">|&gt;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    Date_yyyy_mm_dd,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    Start_Time_Local_Standard,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    Concentration,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    Station_Name,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    City,</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>    NAPS_ID</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">zero =</span> <span class="fu">sum</span>(Concentration <span class="sc">==</span> <span class="dv">0</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">negative =</span> <span class="fu">sum</span>(Concentration <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">above_100 =</span> <span class="fu">sum</span>(Concentration <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">above_500 =</span> <span class="fu">sum</span>(Concentration <span class="sc">&gt;</span> <span class="dv">500</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">above_1000 =</span> <span class="fu">sum</span>(Concentration <span class="sc">&gt;</span> <span class="dv">1000</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Here, though 2112 is an extreme value, the surrounding observations show sustained high concentrations at the same station over consecutive hours. Therefore, it should not be removed as an erroneous outlier. Note: Fort St.&nbsp;John Max PM2.5 - 2112 and Kamloops Max PM2.5 - 982.</p>
+</section>
+<section id="are-pollutant-and-units-actually-constant" class="level3">
+<h3 class="anchored" data-anchor-id="are-pollutant-and-units-actually-constant">3. Are Pollutant and Units actually constant?</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Pollutant)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Units)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Units have 27,784 missing values and 454,016 rows as µg/m^3 while Pollutant is constant Note: 27,784 rows of Units = 27,784 rows of Concentration are N/A</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">mismatched_missing =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Concentration) <span class="sc">!=</span> <span class="fu">is.na</span>(Units))</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Result of 0 verifies that NAPS leaves Units blank when PM2.5 is missing.</p>
+</section>
+<section id="missing-data-by-station" class="level3">
+<h3 class="anchored" data-anchor-id="missing-data-by-station">4. Missing Data by Station</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(NAPS_ID, Station_Name) <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">observations =</span> <span class="fu">n</span>(),</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Concentration)),</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(percent_missing))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Quite high for few ie. Powell River… has 40.8% missing, and the total missing is 5.77%. A station like Powell River might distort station specific analyses.</p>
+<p>Using a heat map, check whether missing is a random hourly equipment gaps throughout year (less concerning) or an entire month worth of data is missing (concerning).</p>
+<p><em>Figure 1: Missing PM2.5 Measurements by Station and Month</em><br>
+Stations have missingness in subsequent months. Thus, it is not just random hourly equipment gaps. For example, Powell River Station has a high concentration of missing values from August to December.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># separate month from date and calculate percent missing</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>pm25_missing_monthly <span class="ot">&lt;-</span> pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(Date_yyyy_mm_dd, <span class="at">label =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Station_Name, Month) <span class="sc">|&gt;</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># showing only the top </span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>top_missing_stations <span class="ot">&lt;-</span> pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Station_Name) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(percent_missing)) <span class="sc">|&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">15</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(Station_Name)</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>pm25_missing_monthly_top <span class="ot">&lt;-</span> pm25_missing_monthly <span class="sc">|&gt;</span> <span class="fu">filter</span>(Station_Name <span class="sc">%in%</span> top_missing_stations)</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>pm25_missing_monthly_top_plot <span class="ot">&lt;-</span> pm25_missing_monthly_top <span class="sc">|&gt;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Month,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">fct_reorder</span>(Station_Name, percent_missing, <span class="at">.fun =</span> max),</span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> percent_missing</span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Monthly Missing PM2.5 for Stations with the Highest Missingness"</span>,</span>
+<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"British Columbia, 2023"</span>,</span>
+<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Monitoring station"</span>,</span>
+<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Missing (%)"</span></span>
+<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">7</span>),</span>
+<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span>
+<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>pm25_missing_monthly_top_plot</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01-explore-data_files/figure-html/to-show-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<hr>
+</section>
+</section>
+</section>
+<section id="exploring-bc-wildfire-data" class="level1">
+<h1>Exploring BC Wildfire Data</h1>
+<p>The wildfire data were obtained from the Candian National Fire Database (CNFDB) <span class="citation" data-cites="cnfdb2026">(<a href="#ref-cnfdb2026" role="doc-biblioref">Canadian Forest Service 2026</a>)</span>. This dataset contains vegetation fire records and only provides data on “large fires” of at least 200 hectares.</p>
+<section id="inspect-data" class="level2">
+<h2 class="anchored" data-anchor-id="inspect-data">Inspect Data</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>large_fires <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/wildfire/NFDB_point_large_fires.txt"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(large_fires)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">problems</span>(large_fires) </span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="co"># fix wrong predetermined type</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>large_fires <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/raw/wildfire/NFDB_point_large_fires.txt"</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">ATTK_DATE =</span> <span class="fu">col_datetime</span>()))</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="fu">problems</span>(large_fires)</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="co">#| output</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(large_fires)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="bc-fires" class="level2">
+<h2 class="anchored" data-anchor-id="bc-fires">2022-2024 BC Fires</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># large fires in BC during 2022-2024</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>large_fires <span class="sc">|&gt;</span> <span class="fu">count</span>(SRC_AGENCY, <span class="at">sort=</span><span class="cn">TRUE</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="ot">&lt;-</span> large_fires <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SRC_AGENCY <span class="sc">==</span> <span class="st">"BC"</span>, YEAR <span class="sc">%in%</span> <span class="dv">2022</span><span class="sc">:</span><span class="dv">2024</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(large_fires_bc)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Total BC Large Fires (1950-2025): 3209<br>
+Total BC Large Fires (2022-2024): 382</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(REP_DATE) <span class="sc">|&gt;</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(REP_DATE) <span class="sc">|&gt;</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 1
+  REP_DATE           
+  &lt;dttm&gt;             
+1 2022-05-31 00:00:00
+2 2022-06-03 00:00:00
+3 2022-06-16 00:00:00
+4 2022-06-23 00:00:00
+5 2022-06-23 00:00:00
+6 2022-06-28 00:00:00</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(YEAR)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+   YEAR     n
+  &lt;dbl&gt; &lt;int&gt;
+1  2022    63
+2  2023   219
+3  2024   100</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(FIRE_TYPE, <span class="at">sort=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  FIRE_TYPE     n
+  &lt;chr&gt;     &lt;int&gt;
+1 Fire        382</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(CAUSE22, <span class="at">sort=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 2
+  CAUSE22     n
+  &lt;chr&gt;   &lt;int&gt;
+1 N         335
+2 H          36
+3 U          11</code></pre>
+</div>
+</div>
+<p>REP_DATE arrangement shows that the first observation of wildfire in BC (2022-2024) starts on May 31st, 2022.</p>
+<p>Year shows 2023 has the greatest amount of fires.</p>
+<p>FIRE_TYPE does not provide useful information for BC data.</p>
+<p>From the NFDB_point_metadata.pdf, CAUSE:<br>
+[N] Natural/Lightning caused<br>
+[H] Human caused<br>
+[U] Unknown cause<br>
+* Remember to change these for processed data</p>
+<p><em>Figure 2: Large fires by year</em><br>
+From BC large fires by year 2022-2024, 2023 had a much more fires than in other two years. 2023 was also the year when the extreme values of PM2.5 appeared.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(YEAR) <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(YEAR), <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Number of Large Fire Records in BC by Year"</span>,</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Year"</span>,</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of large fires"</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01-explore-data_files/figure-html/bar-graph-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">fires =</span> <span class="fu">n</span>(),</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_latitude =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(LATITUDE)),</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_longitude =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(LONGITUDE)),</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_date =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(REP_DATE)),</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_size =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(SIZE_HA))</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 5
+  fires missing_latitude missing_longitude missing_date missing_size
+  &lt;int&gt;            &lt;int&gt;             &lt;int&gt;        &lt;int&gt;        &lt;int&gt;
+1   382                0                 0            0            0</code></pre>
+</div>
+</div>
+<p>Missing values of 0 is great as latitude, longitude, rep_date, size_ha will be useful in calculating distances between fire and the station.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(PRESCRIBED, <span class="at">sort=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 2
+  PRESCRIBED     n
+  &lt;chr&gt;      &lt;int&gt;
+1 &lt;NA&gt;         382</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(MORE_INFO, <span class="at">sort=</span><span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 281 × 2
+   MORE_INFO                                            n
+   &lt;chr&gt;                                            &lt;int&gt;
+ 1 &lt;NA&gt;                                               101
+ 2 Skudamore Creek                                      2
+ 3 0.5 km N Davis Lake - MODIFIED RESPONSE              1
+ 4 0.8 KM S Oppy Lake - MODIFIED RESPONSE               1
+ 5 1 Mile SW of the Turnagain &amp; Kachinka Confurance     1
+ 6 1.1km NW of Elbow Lake                               1
+ 7 1.5 KM NE of Lonesome Lake                           1
+ 8 1.5 km N of Nadina River                             1
+ 9 1.5 km NE of Taltapin Lake                           1
+10 1.5km SE of Gatcho Lake                              1
+# ℹ 271 more rows</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(RESPONSE, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 2
+  RESPONSE     n
+  &lt;chr&gt;    &lt;int&gt;
+1 FUL        142
+2 MOD        115
+3 MON        102
+4 &lt;NA&gt;        23</code></pre>
+</div>
+</div>
+<p>We can see that PRESCRIBED gives non-usable information for BC records. MORE_INFO shows description of location having 281 different values. RESPONSE (from NFDB_points_metadata.pdf) has three classes: [FUL] Full response, [MOD] Modified response, [MON] Monitor.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_size_ha =</span> <span class="fu">min</span>(SIZE_HA),</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_size_ha =</span> <span class="fu">median</span>(SIZE_HA),</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_size_ha =</span> <span class="fu">mean</span>(SIZE_HA),</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_size_ha =</span> <span class="fu">max</span>(SIZE_HA)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  min_size_ha median_size_ha mean_size_ha max_size_ha
+        &lt;dbl&gt;          &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;
+1         200          1027.       10550.     619072.</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="caption-top table table-sm table-striped small">
+<caption>Figure 3: Summary of BC Large Fire Sizes by Year</caption>
+<colgroup>
+<col style="width: 5%">
+<col style="width: 18%">
+<col style="width: 20%">
+<col style="width: 18%">
+<col style="width: 16%">
+<col style="width: 20%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: right;">Year</th>
+<th style="text-align: right;">Number of Fires</th>
+<th style="text-align: right;">Minimum Size(ha)</th>
+<th style="text-align: right;">Median Size(ha)</th>
+<th style="text-align: right;">Mean Size(ha)</th>
+<th style="text-align: right;">Maximum Size(ha)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">2022</td>
+<td style="text-align: right;">63</td>
+<td style="text-align: right;">203</td>
+<td style="text-align: right;">713.0</td>
+<td style="text-align: right;">2054.2</td>
+<td style="text-align: right;">34753.0</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">2023</td>
+<td style="text-align: right;">219</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">1217.1</td>
+<td style="text-align: right;">12921.4</td>
+<td style="text-align: right;">619072.5</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">2024</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">1066.8</td>
+<td style="text-align: right;">10707.3</td>
+<td style="text-align: right;">508453.3</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p><em>Figure 4: Wildfire Sizes Box Plot by Year</em><br>
+Table and a box plot. With median of 1027 and mean size of 10550, we can understand that it is strongly right-skewed.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(</span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">factor</span>(YEAR),</span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> SIZE_HA</span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Figure 4: Distribution of Large Fire Size in BC"</span>,</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Year"</span>,</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Fire size (hectares, log scale)"</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="01-explore-data_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The logarithmic scaling is useful when there are both very large and very small values, squishing the large ones and spacing the small ones.</p>
+<p><strong>Summary of Data:</strong> 382 BC large vegetation fire records (<span class="math inline">\(\geq\)</span> 200ha) from the Canadian National Fire Database for 2022-2024</p>
+<hr>
+</section>
+</section>
+<section id="explore-2022-2024-air-quality-data" class="level1">
+<h1>Explore 2022 &amp; 2024 Air Quality Data</h1>
+<section id="inspect" class="level2">
+<h2 class="anchored" data-anchor-id="inspect">Inspect</h2>
+<p>Repeating what was done for 2023 is tedious and unnecessary.</p>
+<p>First, load.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>pm25_2022 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2022/data_2022.csv"</span>)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>stations_2022 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2022/stations_2022.csv"</span>)</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>pm25_2024 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2024/data_2024.csv"</span>)</span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>stations_2024 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2024/stations_2024.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<p>Second, check if the column names are same.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">names</span>(pm25_2022), <span class="fu">names</span>(pm25_2023))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">names</span>(pm25_2023), <span class="fu">names</span>(pm25_2024))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">names</span>(stations_2022), <span class="fu">names</span>(stations_2023))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">names</span>(stations_2023), <span class="fu">names</span>(stations_2024))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>Third, all three years together.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Year =</span> <span class="fu">c</span>(<span class="dv">2022</span>, <span class="dv">2023</span>, <span class="dv">2024</span>),</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">PM25_Rows =</span> <span class="fu">c</span>(</span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(pm25_2022),</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(pm25_2023),</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(pm25_2024)</span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stations_With_PM25 =</span> <span class="fu">c</span>(</span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">n_distinct</span>(pm25_2022<span class="sc">$</span>NAPS_ID),</span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">n_distinct</span>(pm25_2023<span class="sc">$</span>NAPS_ID),</span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">n_distinct</span>(pm25_2024<span class="sc">$</span>NAPS_ID)</span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stations_In_Metadata =</span> <span class="fu">c</span>(</span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(stations_2022),</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(stations_2023),</span>
+<span id="cb47-19"><a href="#cb47-19" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(stations_2024)</span>
+<span id="cb47-20"><a href="#cb47-20" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb47-21"><a href="#cb47-21" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 4
+   Year PM25_Rows Stations_With_PM25 Stations_In_Metadata
+  &lt;dbl&gt;     &lt;int&gt;              &lt;int&gt;                &lt;int&gt;
+1  2022    490560                 56                   56
+2  2023    481800                 55                   55
+3  2024    509472                 58                   58</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>pm25_missing_years <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>    pm25_2022 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="dv">2022</span>),</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>    pm25_2023 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="dv">2023</span>),</span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>    pm25_2024 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="dv">2024</span>)</span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year) <span class="sc">|&gt;</span></span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">observations =</span> <span class="fu">n</span>(),</span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Concentration)),</span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb49-11"><a href="#cb49-11" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb49-12"><a href="#cb49-12" aria-hidden="true" tabindex="-1"></a>pm25_missing_years</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 4
+   Year observations missing percent_missing
+  &lt;dbl&gt;        &lt;int&gt;   &lt;int&gt;           &lt;dbl&gt;
+1  2022       490560   23720            4.84
+2  2023       481800   27784            5.77
+3  2024       509472   36818            7.23</code></pre>
+</div>
+</div>
+<p>Stations: 56 -&gt; 55 -&gt; 58 (changing number) Missing: 4.84 -&gt; 5.77 -&gt; 7.23 (growing)</p>
+<p>Note: 2024 is a leap year so it has much more rows</p>
+<p>Final, combine.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>pm25_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  pm25_2022,</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>  pm25_2023,</span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>  pm25_2024</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<hr>
+</section>
+</section>
+<section id="how-to-determine-whether-a-fire-was-relevant-to-pm2.5" class="level1">
+<h1>How to determine whether a fire was relevant to PM2.5?</h1>
+<p>REP_DATE: Date associated with fire<br>
+ATTK_DATE: Fire suppression start date<br>
+OUT_DATE: Fire out date</p>
+<p>REP_DATE == PM2.5 date would not work because fire can still be burning on other days and make the air quality bad. Plus, wind blows and the PM2.5 cover areas in varying times.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_fires =</span> <span class="fu">n</span>(),</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_rep_date =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(REP_DATE)),</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_attack_date =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(ATTK_DATE)),</span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_out_date =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(OUT_DATE))</span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  total_fires missing_rep_date missing_attack_date missing_out_date
+        &lt;int&gt;            &lt;int&gt;               &lt;int&gt;            &lt;int&gt;
+1         382                0                 382               80</code></pre>
+</div>
+</div>
+<p>ATTK_DATE data is unusable since all of them are missing.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>    FIRE_ID,</span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>    FIRENAME,</span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>    REP_DATE,</span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>    ATTK_DATE,</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a>    OUT_DATE,</span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a>    SIZE_HA,</span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>    RESPONSE,</span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>    MORE_INFO</span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">20</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+<section id="using-out_date" class="level2">
+<h2 class="anchored" data-anchor-id="using-out_date">Using OUT_DATE</h2>
+<p>Calculating the duration of the fire in days by finding the difference between reported dates of fire and the date the fire was put out.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate duration through OUT_DATE</span></span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(OUT_DATE)) <span class="sc">|&gt;</span></span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">duration_days =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(OUT_DATE, REP_DATE, <span class="at">units =</span> <span class="st">"days"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_duration =</span> <span class="fu">min</span>(duration_days),</span>
+<span id="cb55-7"><a href="#cb55-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_duration =</span> <span class="fu">median</span>(duration_days),</span>
+<span id="cb55-8"><a href="#cb55-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_duration =</span> <span class="fu">mean</span>(duration_days),</span>
+<span id="cb55-9"><a href="#cb55-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_duration =</span> <span class="fu">max</span>(duration_days)</span>
+<span id="cb55-10"><a href="#cb55-10" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+  min_duration median_duration mean_duration max_duration
+         &lt;dbl&gt;           &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;
+1           -2            93.5          97.6          325</code></pre>
+</div>
+</div>
+<p>The min_duration of -2 shows that there are inconsistencies.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="co"># find out which row gives a duration days below 0</span></span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(OUT_DATE)) <span class="sc">|&gt;</span></span>
+<span id="cb57-4"><a href="#cb57-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">duration_days =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(OUT_DATE, REP_DATE, <span class="at">units =</span> <span class="st">"days"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb57-5"><a href="#cb57-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(duration_days <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb57-6"><a href="#cb57-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb57-7"><a href="#cb57-7" aria-hidden="true" tabindex="-1"></a>    NFDBFIREID,</span>
+<span id="cb57-8"><a href="#cb57-8" aria-hidden="true" tabindex="-1"></a>    FIRENAME,</span>
+<span id="cb57-9"><a href="#cb57-9" aria-hidden="true" tabindex="-1"></a>    REP_DATE,</span>
+<span id="cb57-10"><a href="#cb57-10" aria-hidden="true" tabindex="-1"></a>    OUT_DATE,</span>
+<span id="cb57-11"><a href="#cb57-11" aria-hidden="true" tabindex="-1"></a>    duration_days,</span>
+<span id="cb57-12"><a href="#cb57-12" aria-hidden="true" tabindex="-1"></a>    SIZE_HA,</span>
+<span id="cb57-13"><a href="#cb57-13" aria-hidden="true" tabindex="-1"></a>    MORE_INFO</span>
+<span id="cb57-14"><a href="#cb57-14" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 7
+  NFDBFIREID      FIRENAME REP_DATE            OUT_DATE            duration_days
+  &lt;chr&gt;           &lt;chr&gt;    &lt;dttm&gt;              &lt;dttm&gt;                      &lt;dbl&gt;
+1 BC-2022-2022-G… &lt;NA&gt;     2022-05-31 00:00:00 2022-05-29 00:00:00            -2
+# ℹ 2 more variables: SIZE_HA &lt;dbl&gt;, MORE_INFO &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Only one row. This can be treated as missing when cleaning data.</p>
+<p>Finding the PM2.5 data between REP_DATE and OUT_DATE is very crude and potentially treat a fire equally as day 2 as day 92.</p>
+</section>
+<section id="using-rep_date-only" class="level2">
+<h2 class="anchored" data-anchor-id="using-rep_date-only">Using REP_DATE only</h2>
+<p>REP_DATE has no missing values making it more reliable.</p>
+<p>This uses a recent-fire variable (to be created). It is going to check previous 7/14/30 days of air-quality stations and find any large fires within different perimeters in those days.</p>
+<p>This is not looking for currently “active” fires like was told before.</p>
+<hr>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<section id="air-quality-data" class="level2">
+<h2 class="anchored" data-anchor-id="air-quality-data">Air Quality Data</h2>
+<ul>
+<li>NAPS provides complete hourly station grids for each year</li>
+<li>PM2.5 measurement missingness ranges from 4.84% to 7.23% across 2022–2024</li>
+<li>Missingness varies substantially between monitoring stations and many appear in subsequent months</li>
+<li>Extreme PM2.5 values occur in sustained episodes</li>
+</ul>
+</section>
+<section id="large-fire-data" class="level2">
+<h2 class="anchored" data-anchor-id="large-fire-data">Large Fire Data</h2>
+<ul>
+<li>382 BC large vegetation fire records available from 2022-2024</li>
+<li>Fire size is strongly right-skewed</li>
+<li>Following provides non-usable information for BC 2022-2024 records: PRESECRIBED, ATTK_DATE, FIRE_TYPE</li>
+<li>OUT_DATE contains one inconsistent record that was found</li>
+<li>Use recent-fire windows based on <code>Fire_Date</code> to connect to PM2.5 date</li>
+</ul>
+</section>
+<section id="analysis-design" class="level2">
+<h2 class="anchored" data-anchor-id="analysis-design">Analysis Design</h2>
+<p>One monitoring station on one day with columns being:</p>
+<ul>
+<li>Date</li>
+<li>NAPS_ID</li>
+<li>Station_Name</li>
+<li>Latitude</li>
+<li>Longitude</li>
+<li>mean_pm25</li>
+<li>max_pm25</li>
+<li>hours_observed</li>
+<li>recent_fire_count_100km</li>
+<li>recent_fire_count_250km</li>
+<li>recent_fire_area_250km</li>
+<li>nearest_recent_fire_km</li>
+<li>Year</li>
+<li>Month</li>
+</ul>
+<p>These are the questions I have formed and will be answering:</p>
+<ul>
+<li>How did daily PM2.5 differ between 2022-2024?</li>
+<li>Can we classify a station day as High-PM2.5 vs.&nbsp;Normal?</li>
+<li>Can recent large-fire proximity/activity help predict daily PM2.5?</li>
+<li>Do distinct types of station-days apppear naturally?</li>
+</ul>
+
+
+<!-- -->
+
+
+</section>
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-cnfdb2026" class="csl-entry" role="listitem">
+Canadian Forest Service. 2026. <em>Canadian National Fire Database – Agency Fire Data</em>. Natural Resources Canada. <a href="https://cwfis.cfs.nrcan.gc.ca/en_CA/nfdb">https://cwfis.cfs.nrcan.gc.ca/en_CA/nfdb</a>.
+</div>
+<div id="ref-ecccNAPS2026" class="csl-entry" role="listitem">
+Environment and Climate Change Canada. 2026. <em>National Air Pollution Surveillance (NAPS) Program</em>. Government of Canada. <a href="https://open.canada.ca/data/en/dataset/1b36a356-defd-4813-acea-47bc3abd859b">https://open.canada.ca/data/en/dataset/1b36a356-defd-4813-acea-47bc3abd859b</a>.
+</div>
+<div id="ref-bcPM25Objectives2026" class="csl-entry" role="listitem">
+Government of British Columbia. 2026. <em>Provincial Air Quality Objectives for PM2.5</em>. <a href="https://www2.gov.bc.ca/gov/content/environment/air-land-water/air/air-quality-management/regulatory-framework/objectives-standards/pm2-5">https://www2.gov.bc.ca/gov/content/environment/air-land-water/air/air-quality-management/regulatory-framework/objectives-standards/pm2-5</a>.
+</div>
+</div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb59" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> Exploring Data</span></span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references.bib</span></span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a><span class="an">link-citations:</span><span class="co"> true</span></span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a><span class="an">execute:</span></span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a><span class="co">  output: false</span></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: load-packages</span></span>
+<span id="cb59-13"><a href="#cb59-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb59-14"><a href="#cb59-14" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-15"><a href="#cb59-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-16"><a href="#cb59-16" aria-hidden="true" tabindex="-1"></a><span class="fu"># Exploring BC Air Quality Data</span></span>
+<span id="cb59-17"><a href="#cb59-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-18"><a href="#cb59-18" aria-hidden="true" tabindex="-1"></a>The hourly PM2.5 observations wer obtained from the National Air Pollution Surveillance (NAPS) Program <span class="co">[</span><span class="ot">@ecccNAPS2026</span><span class="co">]</span>.</span>
+<span id="cb59-19"><a href="#cb59-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-20"><a href="#cb59-20" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inspect Air Quality Datasets</span></span>
+<span id="cb59-23"><a href="#cb59-23" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-24"><a href="#cb59-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: load-data</span></span>
+<span id="cb59-25"><a href="#cb59-25" aria-hidden="true" tabindex="-1"></a>pm25_2023 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2023/data_2023.csv"</span>)</span>
+<span id="cb59-26"><a href="#cb59-26" aria-hidden="true" tabindex="-1"></a>stations_2023 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2023/stations_2023.csv"</span>)</span>
+<span id="cb59-27"><a href="#cb59-27" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(pm25_2023<span class="sc">$</span>NAPS_ID) <span class="co"># monitoring stations</span></span>
+<span id="cb59-28"><a href="#cb59-28" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-29"><a href="#cb59-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-30"><a href="#cb59-30" aria-hidden="true" tabindex="-1"></a>**data_2023.csv:**  </span>
+<span id="cb59-31"><a href="#cb59-31" aria-hidden="true" tabindex="-1"></a>Data has 481800 hourly PM2.5 observations across BC for 2023 (8 columns). Each row shows one PM2.5 concentration measurement, one monitoring station, one date, start, and end time.  </span>
+<span id="cb59-32"><a href="#cb59-32" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Important: NAPS_ID -&gt; can connect to stations_2023.csv</span>
+<span id="cb59-33"><a href="#cb59-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-34"><a href="#cb59-34" aria-hidden="true" tabindex="-1"></a>**stations_2023.csv:**  </span>
+<span id="cb59-35"><a href="#cb59-35" aria-hidden="true" tabindex="-1"></a>Observations are recorded by **55** monitoring stations.  </span>
+<span id="cb59-36"><a href="#cb59-36" aria-hidden="true" tabindex="-1"></a>Useful fields out of 43:  </span>
+<span id="cb59-37"><a href="#cb59-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-38"><a href="#cb59-38" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>NAPS_ID  </span>
+<span id="cb59-39"><a href="#cb59-39" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Station_Name  </span>
+<span id="cb59-40"><a href="#cb59-40" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>City  </span>
+<span id="cb59-41"><a href="#cb59-41" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>Latitude: will be used to calculate distances from nearby fires  </span>
+<span id="cb59-42"><a href="#cb59-42" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>Longitude: same as latitude  </span>
+<span id="cb59-43"><a href="#cb59-43" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>Elevation_m  </span>
+<span id="cb59-44"><a href="#cb59-44" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>Site_Type  </span>
+<span id="cb59-45"><a href="#cb59-45" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>Urbanization  </span>
+<span id="cb59-46"><a href="#cb59-46" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>Land_Use  </span>
+<span id="cb59-47"><a href="#cb59-47" aria-hidden="true" tabindex="-1"></a><span class="ss">+ </span>AQMS_Airzone  </span>
+<span id="cb59-48"><a href="#cb59-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-49"><a href="#cb59-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-50"><a href="#cb59-50" aria-hidden="true" tabindex="-1"></a><span class="fu">### Research</span></span>
+<span id="cb59-51"><a href="#cb59-51" aria-hidden="true" tabindex="-1"></a>Particulate Matter (PM) is a complex mix of solids and aerosols. PM2.5 describes the fine particulate matter that are 2.5 microns or less in diameter (PM2.5).</span>
+<span id="cb59-52"><a href="#cb59-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-53"><a href="#cb59-53" aria-hidden="true" tabindex="-1"></a>**Ambient Air Quality Standard in BC:**  </span>
+<span id="cb59-54"><a href="#cb59-54" aria-hidden="true" tabindex="-1"></a>24-Hour Average: 25 µg/m^3  </span>
+<span id="cb59-55"><a href="#cb59-55" aria-hidden="true" tabindex="-1"></a>Annual: 8 µg/m^3  <span class="co">[</span><span class="ot">@bcPM25Objectives2026</span><span class="co">]</span></span>
+<span id="cb59-56"><a href="#cb59-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-57"><a href="#cb59-57" aria-hidden="true" tabindex="-1"></a><span class="fu">## Joined Station and PM2.5</span></span>
+<span id="cb59-58"><a href="#cb59-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-61"><a href="#cb59-61" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-62"><a href="#cb59-62" aria-hidden="true" tabindex="-1"></a><span class="co"># check that the number and IDs of monitoring stations match</span></span>
+<span id="cb59-63"><a href="#cb59-63" aria-hidden="true" tabindex="-1"></a><span class="fu">nrow</span>(stations_2023)</span>
+<span id="cb59-64"><a href="#cb59-64" aria-hidden="true" tabindex="-1"></a><span class="fu">n_distinct</span>(stations_2023<span class="sc">$</span>NAPS_ID)</span>
+<span id="cb59-65"><a href="#cb59-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-66"><a href="#cb59-66" aria-hidden="true" tabindex="-1"></a><span class="fu">anti_join</span>(</span>
+<span id="cb59-67"><a href="#cb59-67" aria-hidden="true" tabindex="-1"></a>  pm25_2023 <span class="sc">|&gt;</span> <span class="fu">distinct</span>(NAPS_ID),</span>
+<span id="cb59-68"><a href="#cb59-68" aria-hidden="true" tabindex="-1"></a>  stations_2023 <span class="sc">|&gt;</span> <span class="fu">distinct</span>(NAPS_ID),</span>
+<span id="cb59-69"><a href="#cb59-69" aria-hidden="true" tabindex="-1"></a>  <span class="at">by =</span> <span class="st">"NAPS_ID"</span></span>
+<span id="cb59-70"><a href="#cb59-70" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb59-71"><a href="#cb59-71" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-72"><a href="#cb59-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-75"><a href="#cb59-75" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-76"><a href="#cb59-76" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: clean-stations</span></span>
+<span id="cb59-77"><a href="#cb59-77" aria-hidden="true" tabindex="-1"></a>station_info_2023 <span class="ot">&lt;-</span> stations_2023 <span class="sc">|&gt;</span></span>
+<span id="cb59-78"><a href="#cb59-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb59-79"><a href="#cb59-79" aria-hidden="true" tabindex="-1"></a>    NAPS_ID,</span>
+<span id="cb59-80"><a href="#cb59-80" aria-hidden="true" tabindex="-1"></a>    Station_Name,</span>
+<span id="cb59-81"><a href="#cb59-81" aria-hidden="true" tabindex="-1"></a>    City,</span>
+<span id="cb59-82"><a href="#cb59-82" aria-hidden="true" tabindex="-1"></a>    Latitude,</span>
+<span id="cb59-83"><a href="#cb59-83" aria-hidden="true" tabindex="-1"></a>    Longitude,</span>
+<span id="cb59-84"><a href="#cb59-84" aria-hidden="true" tabindex="-1"></a>    Elevation_m,</span>
+<span id="cb59-85"><a href="#cb59-85" aria-hidden="true" tabindex="-1"></a>    Site_Type,</span>
+<span id="cb59-86"><a href="#cb59-86" aria-hidden="true" tabindex="-1"></a>    Urbanization,</span>
+<span id="cb59-87"><a href="#cb59-87" aria-hidden="true" tabindex="-1"></a>    Land_Use,</span>
+<span id="cb59-88"><a href="#cb59-88" aria-hidden="true" tabindex="-1"></a>    AQMS_Airzone</span>
+<span id="cb59-89"><a href="#cb59-89" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-90"><a href="#cb59-90" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(station_info_2023)</span>
+<span id="cb59-91"><a href="#cb59-91" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-92"><a href="#cb59-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-95"><a href="#cb59-95" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-96"><a href="#cb59-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: join</span></span>
+<span id="cb59-97"><a href="#cb59-97" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="ot">&lt;-</span> pm25_2023 <span class="sc">|&gt;</span></span>
+<span id="cb59-98"><a href="#cb59-98" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(station_info_2023, <span class="at">by =</span> <span class="st">"NAPS_ID"</span>)</span>
+<span id="cb59-99"><a href="#cb59-99" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(pm25_2023_joined) <span class="co"># result should have 10+8-1=17 columns</span></span>
+<span id="cb59-100"><a href="#cb59-100" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-101"><a href="#cb59-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-102"><a href="#cb59-102" aria-hidden="true" tabindex="-1"></a><span class="fu">### 1. How much is PM2.5 data missing?</span></span>
+<span id="cb59-105"><a href="#cb59-105" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-106"><a href="#cb59-106" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb59-107"><a href="#cb59-107" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-108"><a href="#cb59-108" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_rows =</span> <span class="fu">n</span>(),</span>
+<span id="cb59-109"><a href="#cb59-109" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_concentration =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Concentration)),</span>
+<span id="cb59-110"><a href="#cb59-110" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb59-111"><a href="#cb59-111" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-112"><a href="#cb59-112" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-113"><a href="#cb59-113" aria-hidden="true" tabindex="-1"></a>27,784 rows missing concentration (5.77%)</span>
+<span id="cb59-114"><a href="#cb59-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-115"><a href="#cb59-115" aria-hidden="true" tabindex="-1"></a><span class="fu">### 2. PM2.5 concentration distribution</span></span>
+<span id="cb59-118"><a href="#cb59-118" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-119"><a href="#cb59-119" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-120"><a href="#cb59-120" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(pm25_2023_joined<span class="sc">$</span>Concentration)</span>
+<span id="cb59-121"><a href="#cb59-121" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-122"><a href="#cb59-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-123"><a href="#cb59-123" aria-hidden="true" tabindex="-1"></a>Max of 2112 is very big compared to others.</span>
+<span id="cb59-126"><a href="#cb59-126" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-127"><a href="#cb59-127" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: compare-2112</span></span>
+<span id="cb59-128"><a href="#cb59-128" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb59-129"><a href="#cb59-129" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(Concentration)) <span class="sc">|&gt;</span></span>
+<span id="cb59-130"><a href="#cb59-130" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(Concentration)) <span class="sc">|&gt;</span></span>
+<span id="cb59-131"><a href="#cb59-131" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb59-132"><a href="#cb59-132" aria-hidden="true" tabindex="-1"></a>    Date_yyyy_mm_dd,</span>
+<span id="cb59-133"><a href="#cb59-133" aria-hidden="true" tabindex="-1"></a>    Start_Time_Local_Standard,</span>
+<span id="cb59-134"><a href="#cb59-134" aria-hidden="true" tabindex="-1"></a>    Concentration,</span>
+<span id="cb59-135"><a href="#cb59-135" aria-hidden="true" tabindex="-1"></a>    Station_Name,</span>
+<span id="cb59-136"><a href="#cb59-136" aria-hidden="true" tabindex="-1"></a>    City,</span>
+<span id="cb59-137"><a href="#cb59-137" aria-hidden="true" tabindex="-1"></a>    NAPS_ID</span>
+<span id="cb59-138"><a href="#cb59-138" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb59-139"><a href="#cb59-139" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">20</span>)</span>
+<span id="cb59-140"><a href="#cb59-140" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-143"><a href="#cb59-143" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-144"><a href="#cb59-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: summary-of-high</span></span>
+<span id="cb59-145"><a href="#cb59-145" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb59-146"><a href="#cb59-146" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-147"><a href="#cb59-147" aria-hidden="true" tabindex="-1"></a>    <span class="at">zero =</span> <span class="fu">sum</span>(Concentration <span class="sc">==</span> <span class="dv">0</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb59-148"><a href="#cb59-148" aria-hidden="true" tabindex="-1"></a>    <span class="at">negative =</span> <span class="fu">sum</span>(Concentration <span class="sc">&lt;</span> <span class="dv">0</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb59-149"><a href="#cb59-149" aria-hidden="true" tabindex="-1"></a>    <span class="at">above_100 =</span> <span class="fu">sum</span>(Concentration <span class="sc">&gt;</span> <span class="dv">100</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb59-150"><a href="#cb59-150" aria-hidden="true" tabindex="-1"></a>    <span class="at">above_500 =</span> <span class="fu">sum</span>(Concentration <span class="sc">&gt;</span> <span class="dv">500</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>),</span>
+<span id="cb59-151"><a href="#cb59-151" aria-hidden="true" tabindex="-1"></a>    <span class="at">above_1000 =</span> <span class="fu">sum</span>(Concentration <span class="sc">&gt;</span> <span class="dv">1000</span>, <span class="at">na.rm=</span><span class="cn">TRUE</span>)</span>
+<span id="cb59-152"><a href="#cb59-152" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-153"><a href="#cb59-153" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-154"><a href="#cb59-154" aria-hidden="true" tabindex="-1"></a>Here, though 2112 is an extreme value, the surrounding observations show sustained high concentrations at the same station over consecutive hours. Therefore, it should not be removed as an erroneous outlier. Note: Fort St. John Max PM2.5 - 2112 and Kamloops Max PM2.5 - 982.</span>
+<span id="cb59-155"><a href="#cb59-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-156"><a href="#cb59-156" aria-hidden="true" tabindex="-1"></a><span class="fu">### 3. Are Pollutant and Units actually constant?</span></span>
+<span id="cb59-159"><a href="#cb59-159" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-160"><a href="#cb59-160" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb59-161"><a href="#cb59-161" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Pollutant)</span>
+<span id="cb59-162"><a href="#cb59-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-163"><a href="#cb59-163" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb59-164"><a href="#cb59-164" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Units)</span>
+<span id="cb59-165"><a href="#cb59-165" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-166"><a href="#cb59-166" aria-hidden="true" tabindex="-1"></a>Units have 27,784 missing values and 454,016 rows as µg/m^3 while Pollutant is constant</span>
+<span id="cb59-167"><a href="#cb59-167" aria-hidden="true" tabindex="-1"></a>Note: 27,784 rows of Units = 27,784 rows of Concentration are N/A</span>
+<span id="cb59-170"><a href="#cb59-170" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-171"><a href="#cb59-171" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb59-172"><a href="#cb59-172" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-173"><a href="#cb59-173" aria-hidden="true" tabindex="-1"></a>    <span class="at">mismatched_missing =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Concentration) <span class="sc">!=</span> <span class="fu">is.na</span>(Units))</span>
+<span id="cb59-174"><a href="#cb59-174" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-175"><a href="#cb59-175" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-176"><a href="#cb59-176" aria-hidden="true" tabindex="-1"></a>Result of 0 verifies that NAPS leaves Units blank when PM2.5 is missing.</span>
+<span id="cb59-177"><a href="#cb59-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-178"><a href="#cb59-178" aria-hidden="true" tabindex="-1"></a><span class="fu">### 4. Missing Data by Station</span></span>
+<span id="cb59-181"><a href="#cb59-181" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-182"><a href="#cb59-182" aria-hidden="true" tabindex="-1"></a>pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb59-183"><a href="#cb59-183" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(NAPS_ID, Station_Name) <span class="sc">|&gt;</span></span>
+<span id="cb59-184"><a href="#cb59-184" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-185"><a href="#cb59-185" aria-hidden="true" tabindex="-1"></a>    <span class="at">observations =</span> <span class="fu">n</span>(),</span>
+<span id="cb59-186"><a href="#cb59-186" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Concentration)),</span>
+<span id="cb59-187"><a href="#cb59-187" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb59-188"><a href="#cb59-188" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb59-189"><a href="#cb59-189" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(percent_missing))</span>
+<span id="cb59-190"><a href="#cb59-190" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-191"><a href="#cb59-191" aria-hidden="true" tabindex="-1"></a>Quite high for few ie. Powell River... has 40.8% missing, and the total missing is 5.77%. A station like Powell River might distort station specific analyses.  </span>
+<span id="cb59-192"><a href="#cb59-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-193"><a href="#cb59-193" aria-hidden="true" tabindex="-1"></a>Using a heat map, check whether missing is a random hourly equipment gaps throughout year (less concerning) or an entire month worth of data is missing (concerning).</span>
+<span id="cb59-194"><a href="#cb59-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-195"><a href="#cb59-195" aria-hidden="true" tabindex="-1"></a>*Figure 1: Missing PM2.5 Measurements by Station and Month*  </span>
+<span id="cb59-196"><a href="#cb59-196" aria-hidden="true" tabindex="-1"></a>Stations have missingness in subsequent months. Thus, it is not just random hourly equipment gaps. For example, Powell River Station has a high concentration of missing values from August to December.</span>
+<span id="cb59-199"><a href="#cb59-199" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-200"><a href="#cb59-200" aria-hidden="true" tabindex="-1"></a><span class="co"># separate month from date and calculate percent missing</span></span>
+<span id="cb59-201"><a href="#cb59-201" aria-hidden="true" tabindex="-1"></a>pm25_missing_monthly <span class="ot">&lt;-</span> pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb59-202"><a href="#cb59-202" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Month =</span> lubridate<span class="sc">::</span><span class="fu">month</span>(Date_yyyy_mm_dd, <span class="at">label =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb59-203"><a href="#cb59-203" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Station_Name, Month) <span class="sc">|&gt;</span></span>
+<span id="cb59-204"><a href="#cb59-204" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-205"><a href="#cb59-205" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb59-206"><a href="#cb59-206" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb59-207"><a href="#cb59-207" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-208"><a href="#cb59-208" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-211"><a href="#cb59-211" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-212"><a href="#cb59-212" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: to-save</span></span>
+<span id="cb59-213"><a href="#cb59-213" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb59-214"><a href="#cb59-214" aria-hidden="true" tabindex="-1"></a>pm25_missing_monthly_plot <span class="ot">&lt;-</span> pm25_missing_monthly <span class="sc">|&gt;</span></span>
+<span id="cb59-215"><a href="#cb59-215" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Month, <span class="at">y =</span> Station_Name, <span class="at">fill =</span> percent_missing)) <span class="sc">+</span></span>
+<span id="cb59-216"><a href="#cb59-216" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb59-217"><a href="#cb59-217" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb59-218"><a href="#cb59-218" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Missing PM2.5 Heat Map by Station and Month"</span>,</span>
+<span id="cb59-219"><a href="#cb59-219" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb59-220"><a href="#cb59-220" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Monitoring station"</span>,</span>
+<span id="cb59-221"><a href="#cb59-221" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Missing (%)"</span></span>
+<span id="cb59-222"><a href="#cb59-222" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb59-223"><a href="#cb59-223" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb59-224"><a href="#cb59-224" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.7</span>),</span>
+<span id="cb59-225"><a href="#cb59-225" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb59-226"><a href="#cb59-226" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">5</span>)</span>
+<span id="cb59-227"><a href="#cb59-227" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-228"><a href="#cb59-228" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-231"><a href="#cb59-231" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-232"><a href="#cb59-232" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: to-show</span></span>
+<span id="cb59-233"><a href="#cb59-233" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-234"><a href="#cb59-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-235"><a href="#cb59-235" aria-hidden="true" tabindex="-1"></a><span class="co"># showing only the top </span></span>
+<span id="cb59-236"><a href="#cb59-236" aria-hidden="true" tabindex="-1"></a>top_missing_stations <span class="ot">&lt;-</span> pm25_2023_joined <span class="sc">|&gt;</span></span>
+<span id="cb59-237"><a href="#cb59-237" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Station_Name) <span class="sc">|&gt;</span></span>
+<span id="cb59-238"><a href="#cb59-238" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-239"><a href="#cb59-239" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span>,</span>
+<span id="cb59-240"><a href="#cb59-240" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb59-241"><a href="#cb59-241" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb59-242"><a href="#cb59-242" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(percent_missing)) <span class="sc">|&gt;</span></span>
+<span id="cb59-243"><a href="#cb59-243" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">15</span>) <span class="sc">|&gt;</span></span>
+<span id="cb59-244"><a href="#cb59-244" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pull</span>(Station_Name)</span>
+<span id="cb59-245"><a href="#cb59-245" aria-hidden="true" tabindex="-1"></a>pm25_missing_monthly_top <span class="ot">&lt;-</span> pm25_missing_monthly <span class="sc">|&gt;</span> <span class="fu">filter</span>(Station_Name <span class="sc">%in%</span> top_missing_stations)</span>
+<span id="cb59-246"><a href="#cb59-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-247"><a href="#cb59-247" aria-hidden="true" tabindex="-1"></a>pm25_missing_monthly_top_plot <span class="ot">&lt;-</span> pm25_missing_monthly_top <span class="sc">|&gt;</span></span>
+<span id="cb59-248"><a href="#cb59-248" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(</span>
+<span id="cb59-249"><a href="#cb59-249" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> Month,</span>
+<span id="cb59-250"><a href="#cb59-250" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="fu">fct_reorder</span>(Station_Name, percent_missing, <span class="at">.fun =</span> max),</span>
+<span id="cb59-251"><a href="#cb59-251" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> percent_missing</span>
+<span id="cb59-252"><a href="#cb59-252" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb59-253"><a href="#cb59-253" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_tile</span>() <span class="sc">+</span></span>
+<span id="cb59-254"><a href="#cb59-254" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb59-255"><a href="#cb59-255" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Monthly Missing PM2.5 for Stations with the Highest Missingness"</span>,</span>
+<span id="cb59-256"><a href="#cb59-256" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">"British Columbia, 2023"</span>,</span>
+<span id="cb59-257"><a href="#cb59-257" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb59-258"><a href="#cb59-258" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Monitoring station"</span>,</span>
+<span id="cb59-259"><a href="#cb59-259" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill =</span> <span class="st">"Missing (%)"</span></span>
+<span id="cb59-260"><a href="#cb59-260" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb59-261"><a href="#cb59-261" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb59-262"><a href="#cb59-262" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb59-263"><a href="#cb59-263" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">size =</span> <span class="dv">8</span>),</span>
+<span id="cb59-264"><a href="#cb59-264" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.text.y =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">7</span>),</span>
+<span id="cb59-265"><a href="#cb59-265" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb59-266"><a href="#cb59-266" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span>
+<span id="cb59-267"><a href="#cb59-267" aria-hidden="true" tabindex="-1"></a>pm25_missing_monthly_top_plot</span>
+<span id="cb59-268"><a href="#cb59-268" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-269"><a href="#cb59-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-270"><a href="#cb59-270" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb59-271"><a href="#cb59-271" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-272"><a href="#cb59-272" aria-hidden="true" tabindex="-1"></a><span class="fu"># Exploring BC Wildfire Data</span></span>
+<span id="cb59-273"><a href="#cb59-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-274"><a href="#cb59-274" aria-hidden="true" tabindex="-1"></a>The wildfire data were obtained from the Candian National Fire Database (CNFDB) <span class="co">[</span><span class="ot">@cnfdb2026</span><span class="co">]</span>. This dataset contains vegetation fire records and only provides data on "large fires" of at least 200 hectares.</span>
+<span id="cb59-275"><a href="#cb59-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-276"><a href="#cb59-276" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inspect Data</span></span>
+<span id="cb59-279"><a href="#cb59-279" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-280"><a href="#cb59-280" aria-hidden="true" tabindex="-1"></a>large_fires <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/wildfire/NFDB_point_large_fires.txt"</span>)</span>
+<span id="cb59-281"><a href="#cb59-281" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(large_fires)</span>
+<span id="cb59-282"><a href="#cb59-282" aria-hidden="true" tabindex="-1"></a><span class="fu">problems</span>(large_fires) </span>
+<span id="cb59-283"><a href="#cb59-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-284"><a href="#cb59-284" aria-hidden="true" tabindex="-1"></a><span class="co"># fix wrong predetermined type</span></span>
+<span id="cb59-285"><a href="#cb59-285" aria-hidden="true" tabindex="-1"></a>large_fires <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(</span>
+<span id="cb59-286"><a href="#cb59-286" aria-hidden="true" tabindex="-1"></a>  <span class="st">"data/raw/wildfire/NFDB_point_large_fires.txt"</span>,</span>
+<span id="cb59-287"><a href="#cb59-287" aria-hidden="true" tabindex="-1"></a>  <span class="at">col_types =</span> <span class="fu">cols</span>(<span class="at">ATTK_DATE =</span> <span class="fu">col_datetime</span>()))</span>
+<span id="cb59-288"><a href="#cb59-288" aria-hidden="true" tabindex="-1"></a><span class="fu">problems</span>(large_fires)</span>
+<span id="cb59-289"><a href="#cb59-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-290"><a href="#cb59-290" aria-hidden="true" tabindex="-1"></a><span class="co">#| output</span></span>
+<span id="cb59-291"><a href="#cb59-291" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(large_fires)</span>
+<span id="cb59-292"><a href="#cb59-292" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-293"><a href="#cb59-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-294"><a href="#cb59-294" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2022-2024 BC Fires</span></span>
+<span id="cb59-297"><a href="#cb59-297" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-298"><a href="#cb59-298" aria-hidden="true" tabindex="-1"></a><span class="co"># large fires in BC during 2022-2024</span></span>
+<span id="cb59-299"><a href="#cb59-299" aria-hidden="true" tabindex="-1"></a>large_fires <span class="sc">|&gt;</span> <span class="fu">count</span>(SRC_AGENCY, <span class="at">sort=</span><span class="cn">TRUE</span>)</span>
+<span id="cb59-300"><a href="#cb59-300" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="ot">&lt;-</span> large_fires <span class="sc">|&gt;</span></span>
+<span id="cb59-301"><a href="#cb59-301" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(SRC_AGENCY <span class="sc">==</span> <span class="st">"BC"</span>, YEAR <span class="sc">%in%</span> <span class="dv">2022</span><span class="sc">:</span><span class="dv">2024</span>)</span>
+<span id="cb59-302"><a href="#cb59-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-303"><a href="#cb59-303" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(large_fires_bc)</span>
+<span id="cb59-304"><a href="#cb59-304" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-305"><a href="#cb59-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-306"><a href="#cb59-306" aria-hidden="true" tabindex="-1"></a>Total BC Large Fires (1950-2025): 3209  </span>
+<span id="cb59-307"><a href="#cb59-307" aria-hidden="true" tabindex="-1"></a>Total BC Large Fires (2022-2024): 382</span>
+<span id="cb59-308"><a href="#cb59-308" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-311"><a href="#cb59-311" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-312"><a href="#cb59-312" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-313"><a href="#cb59-313" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-314"><a href="#cb59-314" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(REP_DATE) <span class="sc">|&gt;</span></span>
+<span id="cb59-315"><a href="#cb59-315" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(REP_DATE) <span class="sc">|&gt;</span></span>
+<span id="cb59-316"><a href="#cb59-316" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span>
+<span id="cb59-317"><a href="#cb59-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-318"><a href="#cb59-318" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-319"><a href="#cb59-319" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(YEAR)</span>
+<span id="cb59-320"><a href="#cb59-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-321"><a href="#cb59-321" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-322"><a href="#cb59-322" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(FIRE_TYPE, <span class="at">sort=</span><span class="cn">TRUE</span>)</span>
+<span id="cb59-323"><a href="#cb59-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-324"><a href="#cb59-324" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-325"><a href="#cb59-325" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(CAUSE22, <span class="at">sort=</span><span class="cn">TRUE</span>)</span>
+<span id="cb59-326"><a href="#cb59-326" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-327"><a href="#cb59-327" aria-hidden="true" tabindex="-1"></a>REP_DATE arrangement shows that the first observation of wildfire in BC (2022-2024) starts on May 31st, 2022.</span>
+<span id="cb59-328"><a href="#cb59-328" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-329"><a href="#cb59-329" aria-hidden="true" tabindex="-1"></a>Year shows 2023 has the greatest amount of fires.</span>
+<span id="cb59-330"><a href="#cb59-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-331"><a href="#cb59-331" aria-hidden="true" tabindex="-1"></a>FIRE_TYPE does not provide useful information for BC data.</span>
+<span id="cb59-332"><a href="#cb59-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-333"><a href="#cb59-333" aria-hidden="true" tabindex="-1"></a>From the NFDB_point_metadata.pdf,</span>
+<span id="cb59-334"><a href="#cb59-334" aria-hidden="true" tabindex="-1"></a>CAUSE:  </span>
+<span id="cb59-335"><a href="#cb59-335" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">N</span><span class="co">]</span> Natural/Lightning caused  </span>
+<span id="cb59-336"><a href="#cb59-336" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">H</span><span class="co">]</span> Human caused  </span>
+<span id="cb59-337"><a href="#cb59-337" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">U</span><span class="co">]</span> Unknown cause  </span>
+<span id="cb59-338"><a href="#cb59-338" aria-hidden="true" tabindex="-1"></a><span class="ss">* </span>Remember to change these for processed data</span>
+<span id="cb59-339"><a href="#cb59-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-340"><a href="#cb59-340" aria-hidden="true" tabindex="-1"></a>*Figure 2: Large fires by year*  </span>
+<span id="cb59-341"><a href="#cb59-341" aria-hidden="true" tabindex="-1"></a>From BC large fires by year 2022-2024, 2023 had a much more fires than in other two years. 2023 was also the year when the extreme values of PM2.5 appeared.  </span>
+<span id="cb59-344"><a href="#cb59-344" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-345"><a href="#cb59-345" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: bar-graph</span></span>
+<span id="cb59-346"><a href="#cb59-346" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-347"><a href="#cb59-347" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-348"><a href="#cb59-348" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(YEAR) <span class="sc">|&gt;</span></span>
+<span id="cb59-349"><a href="#cb59-349" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">factor</span>(YEAR), <span class="at">y =</span> n)) <span class="sc">+</span></span>
+<span id="cb59-350"><a href="#cb59-350" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>() <span class="sc">+</span></span>
+<span id="cb59-351"><a href="#cb59-351" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb59-352"><a href="#cb59-352" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Number of Large Fire Records in BC by Year"</span>,</span>
+<span id="cb59-353"><a href="#cb59-353" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Year"</span>,</span>
+<span id="cb59-354"><a href="#cb59-354" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Number of large fires"</span></span>
+<span id="cb59-355"><a href="#cb59-355" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb59-356"><a href="#cb59-356" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb59-357"><a href="#cb59-357" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-358"><a href="#cb59-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-361"><a href="#cb59-361" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-362"><a href="#cb59-362" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: missing-values</span></span>
+<span id="cb59-363"><a href="#cb59-363" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-364"><a href="#cb59-364" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-365"><a href="#cb59-365" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-366"><a href="#cb59-366" aria-hidden="true" tabindex="-1"></a>    <span class="at">fires =</span> <span class="fu">n</span>(),</span>
+<span id="cb59-367"><a href="#cb59-367" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_latitude =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(LATITUDE)),</span>
+<span id="cb59-368"><a href="#cb59-368" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_longitude =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(LONGITUDE)),</span>
+<span id="cb59-369"><a href="#cb59-369" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_date =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(REP_DATE)),</span>
+<span id="cb59-370"><a href="#cb59-370" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_size =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(SIZE_HA))</span>
+<span id="cb59-371"><a href="#cb59-371" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-372"><a href="#cb59-372" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-373"><a href="#cb59-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-374"><a href="#cb59-374" aria-hidden="true" tabindex="-1"></a>Missing values of 0 is great as latitude, longitude, rep_date, size_ha will be useful in calculating distances between fire and the station.  </span>
+<span id="cb59-375"><a href="#cb59-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-378"><a href="#cb59-378" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-379"><a href="#cb59-379" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-380"><a href="#cb59-380" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-381"><a href="#cb59-381" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(PRESCRIBED, <span class="at">sort=</span><span class="cn">TRUE</span>)</span>
+<span id="cb59-382"><a href="#cb59-382" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-383"><a href="#cb59-383" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-384"><a href="#cb59-384" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(MORE_INFO, <span class="at">sort=</span><span class="cn">TRUE</span>)</span>
+<span id="cb59-385"><a href="#cb59-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-386"><a href="#cb59-386" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-387"><a href="#cb59-387" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(RESPONSE, <span class="at">sort =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb59-388"><a href="#cb59-388" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-389"><a href="#cb59-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-390"><a href="#cb59-390" aria-hidden="true" tabindex="-1"></a>We can see that PRESCRIBED gives non-usable information for BC records. MORE_INFO shows description of location having 281 different values. RESPONSE (from NFDB_points_metadata.pdf) has three classes: <span class="co">[</span><span class="ot">FUL</span><span class="co">]</span> Full response, <span class="co">[</span><span class="ot">MOD</span><span class="co">]</span> Modified response, <span class="co">[</span><span class="ot">MON</span><span class="co">]</span> Monitor.</span>
+<span id="cb59-391"><a href="#cb59-391" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-394"><a href="#cb59-394" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-395"><a href="#cb59-395" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: area</span></span>
+<span id="cb59-396"><a href="#cb59-396" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-397"><a href="#cb59-397" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-398"><a href="#cb59-398" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-399"><a href="#cb59-399" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_size_ha =</span> <span class="fu">min</span>(SIZE_HA),</span>
+<span id="cb59-400"><a href="#cb59-400" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_size_ha =</span> <span class="fu">median</span>(SIZE_HA),</span>
+<span id="cb59-401"><a href="#cb59-401" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_size_ha =</span> <span class="fu">mean</span>(SIZE_HA),</span>
+<span id="cb59-402"><a href="#cb59-402" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_size_ha =</span> <span class="fu">max</span>(SIZE_HA)</span>
+<span id="cb59-403"><a href="#cb59-403" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-404"><a href="#cb59-404" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-405"><a href="#cb59-405" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-408"><a href="#cb59-408" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-409"><a href="#cb59-409" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-410"><a href="#cb59-410" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
+<span id="cb59-411"><a href="#cb59-411" aria-hidden="true" tabindex="-1"></a>fire_size_by_year <span class="ot">&lt;-</span> large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-412"><a href="#cb59-412" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(YEAR) <span class="sc">|&gt;</span></span>
+<span id="cb59-413"><a href="#cb59-413" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-414"><a href="#cb59-414" aria-hidden="true" tabindex="-1"></a>    <span class="at">fires =</span> <span class="fu">n</span>(),</span>
+<span id="cb59-415"><a href="#cb59-415" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_size_ha =</span> <span class="fu">min</span>(SIZE_HA),</span>
+<span id="cb59-416"><a href="#cb59-416" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_size_ha =</span> <span class="fu">median</span>(SIZE_HA),</span>
+<span id="cb59-417"><a href="#cb59-417" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_size_ha =</span> <span class="fu">mean</span>(SIZE_HA),</span>
+<span id="cb59-418"><a href="#cb59-418" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_size_ha =</span> <span class="fu">max</span>(SIZE_HA)</span>
+<span id="cb59-419"><a href="#cb59-419" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-420"><a href="#cb59-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-421"><a href="#cb59-421" aria-hidden="true" tabindex="-1"></a><span class="co"># create a table</span></span>
+<span id="cb59-422"><a href="#cb59-422" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(</span>
+<span id="cb59-423"><a href="#cb59-423" aria-hidden="true" tabindex="-1"></a>  fire_size_by_year,</span>
+<span id="cb59-424"><a href="#cb59-424" aria-hidden="true" tabindex="-1"></a>  <span class="at">col.names =</span> <span class="fu">c</span>(<span class="st">"Year"</span>, <span class="st">"Number of Fires"</span>, <span class="st">"Minimum Size(ha)"</span>, <span class="st">"Median Size(ha)"</span>, <span class="st">"Mean Size(ha)"</span>, <span class="st">"Maximum Size(ha)"</span>),</span>
+<span id="cb59-425"><a href="#cb59-425" aria-hidden="true" tabindex="-1"></a>  <span class="at">digits =</span> <span class="dv">1</span>,</span>
+<span id="cb59-426"><a href="#cb59-426" aria-hidden="true" tabindex="-1"></a>  <span class="at">caption =</span> <span class="st">"Figure 3: Summary of BC Large Fire Sizes by Year"</span></span>
+<span id="cb59-427"><a href="#cb59-427" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb59-428"><a href="#cb59-428" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-429"><a href="#cb59-429" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-430"><a href="#cb59-430" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-431"><a href="#cb59-431" aria-hidden="true" tabindex="-1"></a>*Figure 4: Wildfire Sizes Box Plot by Year*  </span>
+<span id="cb59-432"><a href="#cb59-432" aria-hidden="true" tabindex="-1"></a>Table and a box plot. With median of 1027 and mean size of 10550, we can understand that it is strongly right-skewed. </span>
+<span id="cb59-433"><a href="#cb59-433" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-436"><a href="#cb59-436" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-437"><a href="#cb59-437" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-438"><a href="#cb59-438" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-439"><a href="#cb59-439" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(</span>
+<span id="cb59-440"><a href="#cb59-440" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="fu">factor</span>(YEAR),</span>
+<span id="cb59-441"><a href="#cb59-441" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> SIZE_HA</span>
+<span id="cb59-442"><a href="#cb59-442" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb59-443"><a href="#cb59-443" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb59-444"><a href="#cb59-444" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb59-445"><a href="#cb59-445" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb59-446"><a href="#cb59-446" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Figure 4: Distribution of Large Fire Size in BC"</span>,</span>
+<span id="cb59-447"><a href="#cb59-447" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Year"</span>,</span>
+<span id="cb59-448"><a href="#cb59-448" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Fire size (hectares, log scale)"</span></span>
+<span id="cb59-449"><a href="#cb59-449" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb59-450"><a href="#cb59-450" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span>
+<span id="cb59-451"><a href="#cb59-451" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-452"><a href="#cb59-452" aria-hidden="true" tabindex="-1"></a>The logarithmic scaling is useful when there are both very large and very small values, squishing the large ones and spacing the small ones.</span>
+<span id="cb59-453"><a href="#cb59-453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-454"><a href="#cb59-454" aria-hidden="true" tabindex="-1"></a>**Summary of Data:** 382 BC large vegetation fire records ($\geq$ 200ha) from the Canadian National Fire Database for 2022-2024</span>
+<span id="cb59-455"><a href="#cb59-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-456"><a href="#cb59-456" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb59-457"><a href="#cb59-457" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-458"><a href="#cb59-458" aria-hidden="true" tabindex="-1"></a><span class="fu"># Explore 2022 &amp; 2024 Air Quality Data</span></span>
+<span id="cb59-459"><a href="#cb59-459" aria-hidden="true" tabindex="-1"></a><span class="fu">## Inspect</span></span>
+<span id="cb59-460"><a href="#cb59-460" aria-hidden="true" tabindex="-1"></a>Repeating what was done for 2023 is tedious and unnecessary.</span>
+<span id="cb59-461"><a href="#cb59-461" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-462"><a href="#cb59-462" aria-hidden="true" tabindex="-1"></a>First, load.</span>
+<span id="cb59-465"><a href="#cb59-465" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-466"><a href="#cb59-466" aria-hidden="true" tabindex="-1"></a>pm25_2022 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2022/data_2022.csv"</span>)</span>
+<span id="cb59-467"><a href="#cb59-467" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-468"><a href="#cb59-468" aria-hidden="true" tabindex="-1"></a>stations_2022 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2022/stations_2022.csv"</span>)</span>
+<span id="cb59-469"><a href="#cb59-469" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-470"><a href="#cb59-470" aria-hidden="true" tabindex="-1"></a>pm25_2024 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2024/data_2024.csv"</span>)</span>
+<span id="cb59-471"><a href="#cb59-471" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-472"><a href="#cb59-472" aria-hidden="true" tabindex="-1"></a>stations_2024 <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/raw/airquality/2024/stations_2024.csv"</span>)</span>
+<span id="cb59-473"><a href="#cb59-473" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-474"><a href="#cb59-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-475"><a href="#cb59-475" aria-hidden="true" tabindex="-1"></a>Second, check if the column names are same.</span>
+<span id="cb59-478"><a href="#cb59-478" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-479"><a href="#cb59-479" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-480"><a href="#cb59-480" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">names</span>(pm25_2022), <span class="fu">names</span>(pm25_2023))</span>
+<span id="cb59-481"><a href="#cb59-481" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">names</span>(pm25_2023), <span class="fu">names</span>(pm25_2024))</span>
+<span id="cb59-482"><a href="#cb59-482" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-483"><a href="#cb59-483" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">names</span>(stations_2022), <span class="fu">names</span>(stations_2023))</span>
+<span id="cb59-484"><a href="#cb59-484" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(<span class="fu">names</span>(stations_2023), <span class="fu">names</span>(stations_2024))</span>
+<span id="cb59-485"><a href="#cb59-485" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-486"><a href="#cb59-486" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-487"><a href="#cb59-487" aria-hidden="true" tabindex="-1"></a>Third, all three years together.</span>
+<span id="cb59-490"><a href="#cb59-490" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-491"><a href="#cb59-491" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: overview</span></span>
+<span id="cb59-492"><a href="#cb59-492" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-493"><a href="#cb59-493" aria-hidden="true" tabindex="-1"></a><span class="fu">tibble</span>(</span>
+<span id="cb59-494"><a href="#cb59-494" aria-hidden="true" tabindex="-1"></a>  <span class="at">Year =</span> <span class="fu">c</span>(<span class="dv">2022</span>, <span class="dv">2023</span>, <span class="dv">2024</span>),</span>
+<span id="cb59-495"><a href="#cb59-495" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-496"><a href="#cb59-496" aria-hidden="true" tabindex="-1"></a>  <span class="at">PM25_Rows =</span> <span class="fu">c</span>(</span>
+<span id="cb59-497"><a href="#cb59-497" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(pm25_2022),</span>
+<span id="cb59-498"><a href="#cb59-498" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(pm25_2023),</span>
+<span id="cb59-499"><a href="#cb59-499" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(pm25_2024)</span>
+<span id="cb59-500"><a href="#cb59-500" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb59-501"><a href="#cb59-501" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-502"><a href="#cb59-502" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stations_With_PM25 =</span> <span class="fu">c</span>(</span>
+<span id="cb59-503"><a href="#cb59-503" aria-hidden="true" tabindex="-1"></a>    <span class="fu">n_distinct</span>(pm25_2022<span class="sc">$</span>NAPS_ID),</span>
+<span id="cb59-504"><a href="#cb59-504" aria-hidden="true" tabindex="-1"></a>    <span class="fu">n_distinct</span>(pm25_2023<span class="sc">$</span>NAPS_ID),</span>
+<span id="cb59-505"><a href="#cb59-505" aria-hidden="true" tabindex="-1"></a>    <span class="fu">n_distinct</span>(pm25_2024<span class="sc">$</span>NAPS_ID)</span>
+<span id="cb59-506"><a href="#cb59-506" aria-hidden="true" tabindex="-1"></a>  ),</span>
+<span id="cb59-507"><a href="#cb59-507" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb59-508"><a href="#cb59-508" aria-hidden="true" tabindex="-1"></a>  <span class="at">Stations_In_Metadata =</span> <span class="fu">c</span>(</span>
+<span id="cb59-509"><a href="#cb59-509" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(stations_2022),</span>
+<span id="cb59-510"><a href="#cb59-510" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(stations_2023),</span>
+<span id="cb59-511"><a href="#cb59-511" aria-hidden="true" tabindex="-1"></a>    <span class="fu">nrow</span>(stations_2024)</span>
+<span id="cb59-512"><a href="#cb59-512" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-513"><a href="#cb59-513" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb59-514"><a href="#cb59-514" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-515"><a href="#cb59-515" aria-hidden="true" tabindex="-1"></a>pm25_missing_years <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb59-516"><a href="#cb59-516" aria-hidden="true" tabindex="-1"></a>    pm25_2022 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="dv">2022</span>),</span>
+<span id="cb59-517"><a href="#cb59-517" aria-hidden="true" tabindex="-1"></a>    pm25_2023 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="dv">2023</span>),</span>
+<span id="cb59-518"><a href="#cb59-518" aria-hidden="true" tabindex="-1"></a>    pm25_2024 <span class="sc">|&gt;</span> <span class="fu">mutate</span>(<span class="at">Year =</span> <span class="dv">2024</span>)</span>
+<span id="cb59-519"><a href="#cb59-519" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb59-520"><a href="#cb59-520" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Year) <span class="sc">|&gt;</span></span>
+<span id="cb59-521"><a href="#cb59-521" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-522"><a href="#cb59-522" aria-hidden="true" tabindex="-1"></a>    <span class="at">observations =</span> <span class="fu">n</span>(),</span>
+<span id="cb59-523"><a href="#cb59-523" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Concentration)),</span>
+<span id="cb59-524"><a href="#cb59-524" aria-hidden="true" tabindex="-1"></a>    <span class="at">percent_missing =</span> <span class="fu">mean</span>(<span class="fu">is.na</span>(Concentration)) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb59-525"><a href="#cb59-525" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-526"><a href="#cb59-526" aria-hidden="true" tabindex="-1"></a>pm25_missing_years</span>
+<span id="cb59-527"><a href="#cb59-527" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-528"><a href="#cb59-528" aria-hidden="true" tabindex="-1"></a>Stations: 56 -&gt; 55 -&gt; 58 (changing number)</span>
+<span id="cb59-529"><a href="#cb59-529" aria-hidden="true" tabindex="-1"></a>Missing: 4.84 -&gt; 5.77 -&gt; 7.23 (growing)</span>
+<span id="cb59-530"><a href="#cb59-530" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-531"><a href="#cb59-531" aria-hidden="true" tabindex="-1"></a>Note: 2024 is a leap year so it has much more rows</span>
+<span id="cb59-532"><a href="#cb59-532" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-533"><a href="#cb59-533" aria-hidden="true" tabindex="-1"></a>Final, combine.</span>
+<span id="cb59-536"><a href="#cb59-536" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-537"><a href="#cb59-537" aria-hidden="true" tabindex="-1"></a>pm25_all <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb59-538"><a href="#cb59-538" aria-hidden="true" tabindex="-1"></a>  pm25_2022,</span>
+<span id="cb59-539"><a href="#cb59-539" aria-hidden="true" tabindex="-1"></a>  pm25_2023,</span>
+<span id="cb59-540"><a href="#cb59-540" aria-hidden="true" tabindex="-1"></a>  pm25_2024</span>
+<span id="cb59-541"><a href="#cb59-541" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb59-542"><a href="#cb59-542" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-543"><a href="#cb59-543" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-544"><a href="#cb59-544" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb59-545"><a href="#cb59-545" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-546"><a href="#cb59-546" aria-hidden="true" tabindex="-1"></a><span class="fu"># How to determine whether a fire was relevant to PM2.5?</span></span>
+<span id="cb59-547"><a href="#cb59-547" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-548"><a href="#cb59-548" aria-hidden="true" tabindex="-1"></a>REP_DATE: Date associated with fire  </span>
+<span id="cb59-549"><a href="#cb59-549" aria-hidden="true" tabindex="-1"></a>ATTK_DATE: Fire suppression start date  </span>
+<span id="cb59-550"><a href="#cb59-550" aria-hidden="true" tabindex="-1"></a>OUT_DATE: Fire out date  </span>
+<span id="cb59-551"><a href="#cb59-551" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-552"><a href="#cb59-552" aria-hidden="true" tabindex="-1"></a>REP_DATE == PM2.5 date would not work because fire can still be burning on other days and make the air quality bad. Plus, wind blows and the PM2.5 cover areas in varying times.</span>
+<span id="cb59-553"><a href="#cb59-553" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-556"><a href="#cb59-556" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-557"><a href="#cb59-557" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: missing</span></span>
+<span id="cb59-558"><a href="#cb59-558" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-559"><a href="#cb59-559" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-560"><a href="#cb59-560" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-561"><a href="#cb59-561" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_fires =</span> <span class="fu">n</span>(),</span>
+<span id="cb59-562"><a href="#cb59-562" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_rep_date =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(REP_DATE)),</span>
+<span id="cb59-563"><a href="#cb59-563" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_attack_date =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(ATTK_DATE)),</span>
+<span id="cb59-564"><a href="#cb59-564" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing_out_date =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(OUT_DATE))</span>
+<span id="cb59-565"><a href="#cb59-565" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-566"><a href="#cb59-566" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-567"><a href="#cb59-567" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-568"><a href="#cb59-568" aria-hidden="true" tabindex="-1"></a>ATTK_DATE data is unusable since all of them are missing.</span>
+<span id="cb59-569"><a href="#cb59-569" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-572"><a href="#cb59-572" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-573"><a href="#cb59-573" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: get-a-sample</span></span>
+<span id="cb59-574"><a href="#cb59-574" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-575"><a href="#cb59-575" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb59-576"><a href="#cb59-576" aria-hidden="true" tabindex="-1"></a>    FIRE_ID,</span>
+<span id="cb59-577"><a href="#cb59-577" aria-hidden="true" tabindex="-1"></a>    FIRENAME,</span>
+<span id="cb59-578"><a href="#cb59-578" aria-hidden="true" tabindex="-1"></a>    REP_DATE,</span>
+<span id="cb59-579"><a href="#cb59-579" aria-hidden="true" tabindex="-1"></a>    ATTK_DATE,</span>
+<span id="cb59-580"><a href="#cb59-580" aria-hidden="true" tabindex="-1"></a>    OUT_DATE,</span>
+<span id="cb59-581"><a href="#cb59-581" aria-hidden="true" tabindex="-1"></a>    SIZE_HA,</span>
+<span id="cb59-582"><a href="#cb59-582" aria-hidden="true" tabindex="-1"></a>    RESPONSE,</span>
+<span id="cb59-583"><a href="#cb59-583" aria-hidden="true" tabindex="-1"></a>    MORE_INFO</span>
+<span id="cb59-584"><a href="#cb59-584" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb59-585"><a href="#cb59-585" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">20</span>)</span>
+<span id="cb59-586"><a href="#cb59-586" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-587"><a href="#cb59-587" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-588"><a href="#cb59-588" aria-hidden="true" tabindex="-1"></a><span class="fu">## Using OUT_DATE</span></span>
+<span id="cb59-589"><a href="#cb59-589" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-590"><a href="#cb59-590" aria-hidden="true" tabindex="-1"></a>Calculating the duration of the fire in days by finding the difference between reported dates of fire and the date the fire was put out.</span>
+<span id="cb59-591"><a href="#cb59-591" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-594"><a href="#cb59-594" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-595"><a href="#cb59-595" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-596"><a href="#cb59-596" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-597"><a href="#cb59-597" aria-hidden="true" tabindex="-1"></a><span class="co"># calculate duration through OUT_DATE</span></span>
+<span id="cb59-598"><a href="#cb59-598" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-599"><a href="#cb59-599" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(OUT_DATE)) <span class="sc">|&gt;</span></span>
+<span id="cb59-600"><a href="#cb59-600" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">duration_days =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(OUT_DATE, REP_DATE, <span class="at">units =</span> <span class="st">"days"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb59-601"><a href="#cb59-601" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb59-602"><a href="#cb59-602" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_duration =</span> <span class="fu">min</span>(duration_days),</span>
+<span id="cb59-603"><a href="#cb59-603" aria-hidden="true" tabindex="-1"></a>    <span class="at">median_duration =</span> <span class="fu">median</span>(duration_days),</span>
+<span id="cb59-604"><a href="#cb59-604" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_duration =</span> <span class="fu">mean</span>(duration_days),</span>
+<span id="cb59-605"><a href="#cb59-605" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_duration =</span> <span class="fu">max</span>(duration_days)</span>
+<span id="cb59-606"><a href="#cb59-606" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-607"><a href="#cb59-607" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-608"><a href="#cb59-608" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-609"><a href="#cb59-609" aria-hidden="true" tabindex="-1"></a>The min_duration of -2 shows that there are inconsistencies.</span>
+<span id="cb59-610"><a href="#cb59-610" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-613"><a href="#cb59-613" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb59-614"><a href="#cb59-614" aria-hidden="true" tabindex="-1"></a><span class="co">#| output: true</span></span>
+<span id="cb59-615"><a href="#cb59-615" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-616"><a href="#cb59-616" aria-hidden="true" tabindex="-1"></a><span class="co"># find out which row gives a duration days below 0</span></span>
+<span id="cb59-617"><a href="#cb59-617" aria-hidden="true" tabindex="-1"></a>large_fires_bc <span class="sc">|&gt;</span></span>
+<span id="cb59-618"><a href="#cb59-618" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(OUT_DATE)) <span class="sc">|&gt;</span></span>
+<span id="cb59-619"><a href="#cb59-619" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">duration_days =</span> <span class="fu">as.numeric</span>(<span class="fu">difftime</span>(OUT_DATE, REP_DATE, <span class="at">units =</span> <span class="st">"days"</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb59-620"><a href="#cb59-620" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(duration_days <span class="sc">&lt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span></span>
+<span id="cb59-621"><a href="#cb59-621" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(</span>
+<span id="cb59-622"><a href="#cb59-622" aria-hidden="true" tabindex="-1"></a>    NFDBFIREID,</span>
+<span id="cb59-623"><a href="#cb59-623" aria-hidden="true" tabindex="-1"></a>    FIRENAME,</span>
+<span id="cb59-624"><a href="#cb59-624" aria-hidden="true" tabindex="-1"></a>    REP_DATE,</span>
+<span id="cb59-625"><a href="#cb59-625" aria-hidden="true" tabindex="-1"></a>    OUT_DATE,</span>
+<span id="cb59-626"><a href="#cb59-626" aria-hidden="true" tabindex="-1"></a>    duration_days,</span>
+<span id="cb59-627"><a href="#cb59-627" aria-hidden="true" tabindex="-1"></a>    SIZE_HA,</span>
+<span id="cb59-628"><a href="#cb59-628" aria-hidden="true" tabindex="-1"></a>    MORE_INFO</span>
+<span id="cb59-629"><a href="#cb59-629" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb59-630"><a href="#cb59-630" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb59-631"><a href="#cb59-631" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-632"><a href="#cb59-632" aria-hidden="true" tabindex="-1"></a>Only one row. This can be treated as missing when cleaning data.</span>
+<span id="cb59-633"><a href="#cb59-633" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-634"><a href="#cb59-634" aria-hidden="true" tabindex="-1"></a>Finding the PM2.5 data between REP_DATE and OUT_DATE is very crude and potentially treat a fire equally as day 2 as day 92.</span>
+<span id="cb59-635"><a href="#cb59-635" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-636"><a href="#cb59-636" aria-hidden="true" tabindex="-1"></a><span class="fu">## Using REP_DATE only</span></span>
+<span id="cb59-637"><a href="#cb59-637" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-638"><a href="#cb59-638" aria-hidden="true" tabindex="-1"></a>REP_DATE has no missing values making it more reliable. </span>
+<span id="cb59-639"><a href="#cb59-639" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-640"><a href="#cb59-640" aria-hidden="true" tabindex="-1"></a>This uses a recent-fire variable (to be created). It is going to check previous 7/14/30 days of air-quality stations and find any large fires within different perimeters in those days.</span>
+<span id="cb59-641"><a href="#cb59-641" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-642"><a href="#cb59-642" aria-hidden="true" tabindex="-1"></a>This is not looking for currently "active" fires like was told before.</span>
+<span id="cb59-643"><a href="#cb59-643" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-644"><a href="#cb59-644" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb59-645"><a href="#cb59-645" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-646"><a href="#cb59-646" aria-hidden="true" tabindex="-1"></a><span class="fu"># Conclusion</span></span>
+<span id="cb59-647"><a href="#cb59-647" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-648"><a href="#cb59-648" aria-hidden="true" tabindex="-1"></a><span class="fu">## Air Quality Data</span></span>
+<span id="cb59-649"><a href="#cb59-649" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-650"><a href="#cb59-650" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>NAPS provides complete hourly station grids for each year</span>
+<span id="cb59-651"><a href="#cb59-651" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>PM2.5 measurement missingness ranges from 4.84% to 7.23% across 2022–2024</span>
+<span id="cb59-652"><a href="#cb59-652" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Missingness varies substantially between monitoring stations and many appear in subsequent months</span>
+<span id="cb59-653"><a href="#cb59-653" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Extreme PM2.5 values occur in sustained episodes</span>
+<span id="cb59-654"><a href="#cb59-654" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-655"><a href="#cb59-655" aria-hidden="true" tabindex="-1"></a><span class="fu">## Large Fire Data</span></span>
+<span id="cb59-656"><a href="#cb59-656" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-657"><a href="#cb59-657" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>382 BC large vegetation fire records available from 2022-2024</span>
+<span id="cb59-658"><a href="#cb59-658" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Fire size is strongly right-skewed</span>
+<span id="cb59-659"><a href="#cb59-659" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Following provides non-usable information for BC 2022-2024 records: PRESECRIBED, ATTK_DATE, FIRE_TYPE</span>
+<span id="cb59-660"><a href="#cb59-660" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>OUT_DATE contains one inconsistent record that was found</span>
+<span id="cb59-661"><a href="#cb59-661" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Use recent-fire windows based on <span class="in">`Fire_Date`</span> to connect to PM2.5 date</span>
+<span id="cb59-662"><a href="#cb59-662" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-663"><a href="#cb59-663" aria-hidden="true" tabindex="-1"></a><span class="fu">## Analysis Design</span></span>
+<span id="cb59-664"><a href="#cb59-664" aria-hidden="true" tabindex="-1"></a>One monitoring station on one day with columns being:</span>
+<span id="cb59-665"><a href="#cb59-665" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-666"><a href="#cb59-666" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Date</span>
+<span id="cb59-667"><a href="#cb59-667" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>NAPS_ID</span>
+<span id="cb59-668"><a href="#cb59-668" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Station_Name</span>
+<span id="cb59-669"><a href="#cb59-669" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Latitude</span>
+<span id="cb59-670"><a href="#cb59-670" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Longitude</span>
+<span id="cb59-671"><a href="#cb59-671" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>mean_pm25</span>
+<span id="cb59-672"><a href="#cb59-672" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>max_pm25</span>
+<span id="cb59-673"><a href="#cb59-673" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>hours_observed</span>
+<span id="cb59-674"><a href="#cb59-674" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>recent_fire_count_100km</span>
+<span id="cb59-675"><a href="#cb59-675" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>recent_fire_count_250km</span>
+<span id="cb59-676"><a href="#cb59-676" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>recent_fire_area_250km</span>
+<span id="cb59-677"><a href="#cb59-677" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>nearest_recent_fire_km</span>
+<span id="cb59-678"><a href="#cb59-678" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Year</span>
+<span id="cb59-679"><a href="#cb59-679" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Month</span>
+<span id="cb59-680"><a href="#cb59-680" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-681"><a href="#cb59-681" aria-hidden="true" tabindex="-1"></a>These are the questions I have formed and will be answering:  </span>
+<span id="cb59-682"><a href="#cb59-682" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-683"><a href="#cb59-683" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>How did daily PM2.5 differ between 2022-2024?</span>
+<span id="cb59-684"><a href="#cb59-684" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Can we classify a station day as High-PM2.5 vs. Normal?</span>
+<span id="cb59-685"><a href="#cb59-685" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Can recent large-fire proximity/activity help predict daily PM2.5?</span>
+<span id="cb59-686"><a href="#cb59-686" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Do distinct types of station-days apppear naturally?</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

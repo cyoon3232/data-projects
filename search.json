@@ -1,0 +1,582 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Can’t Open Window On A Hot Summer Day",
+    "section": "",
+    "text": "Preventing us from opening the window during sweltering summer days is the air pollutants from fire. How much of the air pollution do wildfires actually cause? Would we be able to predict them?\nUsing R, this project explores the relationship between large wildfire activities and daily PM2.5 air pollutant concentration in British Columbia from 2022-2024.\nIt combines hourly air quality data monitored by stations from NAPS and large fire records from CNFD.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#about",
+    "href": "index.html#about",
+    "title": "Can’t Open Window On A Hot Summer Day",
+    "section": "",
+    "text": "Preventing us from opening the window during sweltering summer days is the air pollutants from fire. How much of the air pollution do wildfires actually cause? Would we be able to predict them?\nUsing R, this project explores the relationship between large wildfire activities and daily PM2.5 air pollutant concentration in British Columbia from 2022-2024.\nIt combines hourly air quality data monitored by stations from NAPS and large fire records from CNFD.",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#key-findings",
+    "href": "index.html#key-findings",
+    "title": "Can’t Open Window On A Hot Summer Day",
+    "section": "Key Findings",
+    "text": "Key Findings\n\nRecent nearby large fire activity was associated with higher daily PM2.5 but the relationship was not sufficient for strong prediction :(\nA KNN classifier performed terribly despite high recall\nKNN and linear regression captured only a limited portion of PM2.5 variation\nK-means clustering identified several distint combinations of wildfire exposure and air-quality conditions",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "index.html#educational-component",
+    "href": "index.html#educational-component",
+    "title": "Can’t Open Window On A Hot Summer Day",
+    "section": "Educational Component",
+    "text": "Educational Component\nThe final learning module shows the two common errors the author encountered during the project.\nUse the sidebar to explore!!",
+    "crumbs": [
+      "Home"
+    ]
+  },
+  {
+    "objectID": "06-k-means-clustering.html",
+    "href": "06-k-means-clustering.html",
+    "title": "K-Means Clustering",
+    "section": "",
+    "text": "Code\nlibrary(tidyverse)\nlibrary(tidymodels)\nlibrary(patchwork)\nCode\nanalysis_valid &lt;- read_csv(\n  \"data/processed/analysis_valid.csv\",\n  show_col_types = FALSE\n)",
+    "crumbs": [
+      "K-Means Clustering"
+    ]
+  },
+  {
+    "objectID": "06-k-means-clustering.html#setup",
+    "href": "06-k-means-clustering.html#setup",
+    "title": "K-Means Clustering",
+    "section": "Setup",
+    "text": "Setup\n\n\nCode\ncluster_data &lt;- analysis_valid |&gt;\n  filter(!is.na(nearest_fire_km_14d)) |&gt;\n  select(\n    mean_pm25,\n    nearest_fire_km_14d,\n    fire_count_100km_7d,\n    fire_count_250km_14d\n  )\n\n\n\n\nCode\ncluster_data_scaled &lt;- cluster_data |&gt;\n  mutate(across(everything(), ~ log1p(.x))) |&gt;\n  mutate(across(everything(), ~ as.numeric(scale(.x))))\n\nsummary(cluster_data_scaled)\n\n\n   mean_pm25        nearest_fire_km_14d fire_count_100km_7d\n Min.   :-2.68845   Min.   :-5.083872   Min.   :-0.316     \n 1st Qu.:-0.61566   1st Qu.:-0.674101   1st Qu.:-0.316     \n Median :-0.07969   Median :-0.004313   Median :-0.316     \n Mean   : 0.00000   Mean   : 0.000000   Mean   : 0.000     \n 3rd Qu.: 0.48599   3rd Qu.: 0.688893   3rd Qu.:-0.316     \n Max.   : 6.72777   Max.   : 2.114454   Max.   :10.439     \n fire_count_250km_14d\n Min.   :-0.9160     \n 1st Qu.:-0.9160     \n Median :-0.1035     \n Mean   : 0.0000     \n 3rd Qu.: 0.7090     \n Max.   : 3.9406",
+    "crumbs": [
+      "K-Means Clustering"
+    ]
+  },
+  {
+    "objectID": "06-k-means-clustering.html#elbow-plot",
+    "href": "06-k-means-clustering.html#elbow-plot",
+    "title": "K-Means Clustering",
+    "section": "Elbow Plot",
+    "text": "Elbow Plot\n\n\nCode\nset.seed(555555)\n\nk_values &lt;- seq(from = 1, to = 100, by = 10)\n\ntotal_withinss &lt;- map_dbl(\n  k_values,\n  ~ kmeans(cluster_data_scaled, centers = .x, nstart = 20)$tot.withinss\n)\n\nelbow_data &lt;- tibble(k = k_values, total_withinss = total_withinss)\n\nelbow_plot &lt;- elbow_data |&gt;\n  ggplot(aes(x = k, y = total_withinss)) +\n  geom_line() +\n  geom_point() +\n  scale_x_continuous(breaks = k_values) +\n  labs(\n    title = \"Elbow Plot for K-Means Clustering\",\n    subtitle = \"Selecting the number of station-day clusters\",\n    x = \"Number of Clusters (K)\",\n    y = \"Total Within-Cluster Sum of Squares\"\n  ) +\n  theme_minimal()\nelbow_plot\n\n\n\n\n\n\n\n\n\nCode\nggsave(\"figures/06_elbow_plot_1.png\", plot = elbow_plot)\n\n\n\n\nCode\nset.seed(555555)\n\nk_values_2 &lt;- seq(from = 1, to = 11, by = 1)\n\ntotal_withinss_2 &lt;- map_dbl(\n  k_values_2,\n  ~ kmeans(cluster_data_scaled, centers = .x, nstart = 20)$tot.withinss\n)\n\nelbow_data_2 &lt;- tibble(k = k_values_2, total_withinss = total_withinss_2)\n\nelbow_plot_2 &lt;- elbow_data_2 |&gt;\n  ggplot(aes(x = k, y = total_withinss)) +\n  geom_line() +\n  geom_point() +\n  scale_x_continuous(breaks = k_values_2) +\n  labs(\n    title = \"Zoomed to 1 to 11\",\n    x = \"Number of Clusters (K)\",\n    y = \"Total Within-Cluster Sum of Squares\"\n  ) +\n  theme_minimal()\n\nelbow_plot_2\n\n\n\n\n\n\n\n\n\nCode\nggsave(\"figures/06_elbow_plot_2.png\", plot = elbow_plot_2)\n\n\nAfter log-transforming and standardizing the clustering variables, the elbow plot showed a clearer bend around K = 4. The bend was vague around 3 and 4 but since the reduction from the left of 4 was more sustantial than the right, four clusters were selected.",
+    "crumbs": [
+      "K-Means Clustering"
+    ]
+  },
+  {
+    "objectID": "06-k-means-clustering.html#fit-k-means-with-k-4",
+    "href": "06-k-means-clustering.html#fit-k-means-with-k-4",
+    "title": "K-Means Clustering",
+    "section": "Fit K-Means with K = 4",
+    "text": "Fit K-Means with K = 4\n\n\nCode\nset.seed(555555)\n\nfinal_kmeans &lt;- kmeans(\n  cluster_data_scaled,\n  centers = 4,\n  nstart = 50\n)\n\n# How many observations ended up in each cluster\ntable(final_kmeans$cluster)\n\n\n\n   1    2    3    4 \n7668 2368 2982 9133 \n\n\nJoin the original data and the cluster label.\n\n\nCode\n# Add cluster label variable to original data\ncluster_results &lt;- cluster_data |&gt;\n  mutate(cluster = factor(final_kmeans$cluster))\n\ncluster_results |&gt; head()",
+    "crumbs": [
+      "K-Means Clustering"
+    ]
+  },
+  {
+    "objectID": "06-k-means-clustering.html#cluster-summary",
+    "href": "06-k-means-clustering.html#cluster-summary",
+    "title": "K-Means Clustering",
+    "section": "Cluster Summary",
+    "text": "Cluster Summary\n\nMean of daily mean PM2.5\nMean and median of nearest fire in km within 14 days\nMean and median of number of fires within 100km in the recent 7 days\nMean and median of number of fires within 250km in the recent 14 days\n\n\n\nCode\ncluster_summary &lt;- cluster_results |&gt;\n  group_by(cluster) |&gt;\n  summarise(\n    station_days = n(),\n\n    cluster_mean_pm25 = mean(mean_pm25),\n    cluster_median_pm25 = median(mean_pm25),\n\n    mean_nearest_fire_km = mean(nearest_fire_km_14d),\n    median_nearest_fire_km = median(nearest_fire_km_14d),\n\n    mean_fire_count_100km_7d = mean(fire_count_100km_7d),\n    median_fire_count_100km_7d = median(fire_count_100km_7d),\n\n    mean_fire_count_250km_14d = mean(fire_count_250km_14d),\n    median_fire_count_250km_14d = median(fire_count_250km_14d),\n\n    .groups = \"drop\"\n  )\n\nprint(cluster_summary, width = Inf)\n\n\n# A tibble: 4 × 10\n  cluster station_days cluster_mean_pm25 cluster_median_pm25\n  &lt;fct&gt;          &lt;int&gt;             &lt;dbl&gt;               &lt;dbl&gt;\n1 1               7668              4.29                4.24\n2 2               2368             12.4                 7.04\n3 3               2982             20.4                13.2 \n4 4               9133              4.58                4.12\n  mean_nearest_fire_km median_nearest_fire_km mean_fire_count_100km_7d\n                 &lt;dbl&gt;                  &lt;dbl&gt;                    &lt;dbl&gt;\n1                150.                   147.                   0      \n2                 64.2                   68.9                  1.61   \n3                156.                   142.                   0.00235\n4                525.                   430.                   0      \n  median_fire_count_100km_7d mean_fire_count_250km_14d\n                       &lt;dbl&gt;                     &lt;dbl&gt;\n1                          0                      3.35\n2                          1                      7.55\n3                          0                      3.61\n4                          0                      0   \n  median_fire_count_250km_14d\n                        &lt;dbl&gt;\n1                           2\n2                           5\n3                           2\n4                           0\n\n\nObserving the data:\nCluster 1 has a moderate distance to fires with the nearest fire being 147 km and median of 2 fires.\nCluster 2 has a close distance to fires with the nearest fire being 68.9 and have a lot of fires within 250km on average having a median of 5.\nCluster 3 has a high mean and median of PM2.5 but nearly no fires within 100 km.\nCluster 4 is far from fires or have minimal fire activity; also has low PM2.5.\n\n\nCode\n# Naming clusters\ncluster_results &lt;- cluster_results |&gt;\n  mutate(\n    station_day_cluster = recode(\n      cluster,\n      `1` = \"Moderately distanced fire activity\",\n      `2` = \"Close & high fire activity\",\n      `3` = \"High PM2.5 with broader fire activity\",\n      `4` = \"Distant or minimal fire activity\"\n    ),\n    \n    station_day_cluster = factor(\n      station_day_cluster,\n      levels = c(\n        \"Distant or minimal fire activity\",\n        \"Moderately distanced fire activity\",\n        \"Close & high fire activity\",\n        \"High PM2.5 with broader fire activity\"\n      )\n    )\n  )",
+    "crumbs": [
+      "K-Means Clustering"
+    ]
+  },
+  {
+    "objectID": "06-k-means-clustering.html#final-cluster-visualization",
+    "href": "06-k-means-clustering.html#final-cluster-visualization",
+    "title": "K-Means Clustering",
+    "section": "Final Cluster Visualization",
+    "text": "Final Cluster Visualization\n\n\nCode\ncluster_plot &lt;- cluster_results |&gt;\n  ggplot(aes(x = nearest_fire_km_14d, y = mean_pm25, color = station_day_cluster)) +\n  geom_point(alpha = 0.25) +\n  labs(\n    title = \"Station-Day Clusters by Fire Proximity and PM2.5\",\n    subtitle = \"Four-cluster K-means solution\",\n    x = \"Distance to nearest recent large fire (km)\",\n    y = \"Daily mean PM2.5 (µg/m³)\",\n    color = \"Station-day cluster\"\n  ) +\n  theme_minimal()\n\ncluster_plot_zoomed &lt;- cluster_plot +\n  coord_cartesian(xlim = c(0, 900), ylim = c(0, 50)) +\n  labs(\n    title =\"\",\n    subtitle = \"Zoomed view of common station-day conditions\"\n  )\n\ncluster_plot / cluster_plot_zoomed",
+    "crumbs": [
+      "K-Means Clustering"
+    ]
+  },
+  {
+    "objectID": "04-knn-classification.html",
+    "href": "04-knn-classification.html",
+    "title": "KNN-Classification",
+    "section": "",
+    "text": "Code\nlibrary(tidyverse)\nlibrary(tidymodels)\nlibrary(patchwork)\nCode\n# load processed analysis data\nanalysis_valid &lt;- read_csv(\n  \"data/processed/analysis_valid.csv\",\n  show_col_types = FALSE)\nThe table below summarizes the most important variables used throughout the data-building and analysis workflow.\nKey variables used throughout the analysis\n\n\nAir Quality\nFire\nRelationship\n\n\n\n\nStation_Date\nFire_ID\ndays_since_fire\n\n\nYear\nFire_Year\nDistance_km\n\n\nMonth\nReport_Date\nfire_count_100km_{7/14/30}d\n\n\nNAPS_ID\nFire_Date\nfire_count_250km_{7/14/30}d\n\n\nStation_Name\nFire_Latitude\nfire_area_250km_{7/14/30}d\n\n\nLatitude\nFire_Longitude\nnearest_fire_km_{7/14/30}d\n\n\nLongitude\nSize_Ha\nrecent_fire_250km_14d\n\n\nmean_pm25\nCause\nfire_activity_250km_14d\n\n\nmax_pm25\nResponse\nfire_distance_group\n\n\nhours_observed\n\n\n\n\nvalid_day\n\n\n\n\nMonth_Name\n\n\n\n\npm25_level",
+    "crumbs": [
+      "KNN Classification"
+    ]
+  },
+  {
+    "objectID": "04-knn-classification.html#question",
+    "href": "04-knn-classification.html#question",
+    "title": "KNN-Classification",
+    "section": "Question",
+    "text": "Question\nCan recent large-fire activity and proximity be used to classify whether a station day observes a very high PM2.5?\nFor this analysis, unusually high PM2.5 is defined as a daily mean PM2.5 concentration at or above the 90th percentile of valid station-days. (Data-derived threshold and not an environmental health standard)",
+    "crumbs": [
+      "KNN Classification"
+    ]
+  },
+  {
+    "objectID": "04-knn-classification.html#define",
+    "href": "04-knn-classification.html#define",
+    "title": "KNN-Classification",
+    "section": "Define",
+    "text": "Define\n\n\nCode\n# define high pm25\nhigh_pm25_cutoff &lt;- quantile(analysis_valid$mean_pm25, 0.90)\nhigh_pm25_cutoff\n\n\n\n\nCode\n# create factor\nclassification_data &lt;- analysis_valid |&gt;\n  mutate(\n    pm25_level = if_else(\n      mean_pm25 &gt;= high_pm25_cutoff,\n      \"High\",\n      \"Normal\"\n    ),\n    \n    pm25_level = factor(\n      pm25_level,\n      levels = c(\n        \"High\",\n        \"Normal\"\n      )\n    )\n  )\n\n\n\n\nCode\n# verify\nclassification_data |&gt;\n  count(pm25_level) |&gt;\n  mutate(percent = n / sum(n) * 100)\n\n\n# A tibble: 2 × 3\n  pm25_level     n percent\n  &lt;fct&gt;      &lt;int&gt;   &lt;dbl&gt;\n1 High        5815    10.0\n2 Normal     52190    90.0\n\n\nVerified that High - 10% and Normal - 90%",
+    "crumbs": [
+      "KNN Classification"
+    ]
+  },
+  {
+    "objectID": "04-knn-classification.html#predictors",
+    "href": "04-knn-classification.html#predictors",
+    "title": "KNN-Classification",
+    "section": "Predictors",
+    "text": "Predictors\n\nfire_count_100km_14d: how much very near fire activity was there?\nfire_count_250km_14d: how much broader fire activity was there\nfire_count_250km_7d: how much of that activity was particularly recent?\n\n\n\nCode\n# select response and predictors\nknn_data &lt;- classification_data |&gt;\n  select(\n    pm25_level,\n    fire_count_100km_14d,\n    fire_count_250km_14d,\n    fire_count_250km_7d\n  )\nknn_data |&gt; head()\n\n\n# A tibble: 6 × 4\n  pm25_level fire_count_100km_14d fire_count_250km_14d fire_count_250km_7d\n  &lt;fct&gt;                     &lt;dbl&gt;                &lt;dbl&gt;               &lt;dbl&gt;\n1 Normal                        0                    0                   0\n2 Normal                        0                    0                   0\n3 Normal                        0                    0                   0\n4 Normal                        0                    0                   0\n5 Normal                        0                    0                   0\n6 Normal                        0                    0                   0\n\n\nCode\n# check for NA values\nknn_data |&gt;\n  summarise(across(everything(), ~ sum(is.na(.x))))\n\n\n# A tibble: 1 × 4\n  pm25_level fire_count_100km_14d fire_count_250km_14d fire_count_250km_7d\n       &lt;int&gt;                &lt;int&gt;                &lt;int&gt;               &lt;int&gt;\n1          0                    0                    0                   0\n\n\nCode\n# distribution\nknn_data |&gt; summary()\n\n\n  pm25_level    fire_count_100km_14d fire_count_250km_14d fire_count_250km_7d\n High  : 5815   Min.   : 0.0000      Min.   : 0.0000      Min.   : 0.0000    \n Normal:52190   1st Qu.: 0.0000      1st Qu.: 0.0000      1st Qu.: 0.0000    \n                Median : 0.0000      Median : 0.0000      Median : 0.0000    \n                Mean   : 0.1238      Mean   : 0.9371      Mean   : 0.4993    \n                3rd Qu.: 0.0000      3rd Qu.: 0.0000      3rd Qu.: 0.0000    \n                Max.   :23.0000      Max.   :62.0000      Max.   :60.0000    \n\n\nSmall Question: How many High-PM2.5 days actually had no recent fire activity according to all 3 predictors?\n\n\nCode\nclassification_data |&gt;\n  mutate(\n    any_recent_fire = if_else(\n      fire_count_100km_14d &gt; 0 |\n      fire_count_250km_14d &gt; 0 |\n      fire_count_250km_7d &gt; 0,\n      \"Some recent fire activity\",\n      \"No recent fire activity\"\n    )\n  ) |&gt;\n  group_by(pm25_level) |&gt;\n  summarise(\n    station_days = n(),\n    with_recent_fire = sum(any_recent_fire == \"Some recent fire activity\"),\n    percent_with_recent_fire =\n      mean(any_recent_fire == \"Some recent fire activity\") * 100,\n    .groups = \"drop\"\n  )\n\n\n# A tibble: 2 × 4\n  pm25_level station_days with_recent_fire percent_with_recent_fire\n  &lt;fct&gt;             &lt;int&gt;            &lt;int&gt;                    &lt;dbl&gt;\n1 High               5815             2232                     38.4\n2 Normal            52190            10542                     20.2\n\n\nHigh PM2.5 station day is about \\(38.4/20.2 \\approx 1.9\\) times likely to have some recent fire activity than a Normal PM2.5 day.",
+    "crumbs": [
+      "KNN Classification"
+    ]
+  },
+  {
+    "objectID": "04-knn-classification.html#setup-train-test-sets",
+    "href": "04-knn-classification.html#setup-train-test-sets",
+    "title": "KNN-Classification",
+    "section": "Setup Train & Test Sets",
+    "text": "Setup Train & Test Sets\n\n\nCode\nset.seed(555555)\n\npm25_split &lt;- initial_split(\n  knn_data,\n  prop = 0.75,\n  strata = pm25_level\n)\n\npm25_train &lt;- training(pm25_split)\npm25_test &lt;- testing(pm25_split)\n\n\nVerify the pm25_level was preserved; result must show 10.0% and 90.0%.\n\n\nCode\npm25_train |&gt;\n  count(pm25_level) |&gt;\n  mutate(\n    percent = n / sum(n) * 100\n  )\n\n\n# A tibble: 2 × 3\n  pm25_level     n percent\n  &lt;fct&gt;      &lt;int&gt;   &lt;dbl&gt;\n1 High        4361    10.0\n2 Normal     39142    90.0\n\n\nCode\npm25_test |&gt;\n  count(pm25_level) |&gt;\n  mutate(\n    percent = n / sum(n) * 100\n  )\n\n\n# A tibble: 2 × 3\n  pm25_level     n percent\n  &lt;fct&gt;      &lt;int&gt;   &lt;dbl&gt;\n1 High        1454    10.0\n2 Normal     13048    90.0",
+    "crumbs": [
+      "KNN Classification"
+    ]
+  },
+  {
+    "objectID": "04-knn-classification.html#tuning-k",
+    "href": "04-knn-classification.html#tuning-k",
+    "title": "KNN-Classification",
+    "section": "Tuning K",
+    "text": "Tuning K\n\n\nCode\nset.seed(555555)\n\n# create recipe and scale predictors\npm25_recipe &lt;- recipe(pm25_level ~ fire_count_100km_14d + fire_count_250km_14d + fire_count_250km_7d, data = pm25_train) |&gt;\n  step_scale(all_predictors()) |&gt;\n  step_center(all_predictors())\n\n# create 5-fold cross-validation on training set\npm25_vfold &lt;- vfold_cv(pm25_train, v = 5, strata = pm25_level)\n\n# create KNN model\nknn_spec &lt;- nearest_neighbor(weight_func = \"rectangular\", neighbors = tune()) |&gt;\n  set_engine(\"kknn\") |&gt;\n  set_mode(\"classification\")\n\n# create workflow\npm25_workflow &lt;- workflow() |&gt;\n  add_recipe(pm25_recipe) |&gt;\n  add_model(knn_spec)\n\n# tune K \nk_final_vals &lt;- tibble(neighbors = seq(from = 1, to = 51, by = 2))\n\n# tuning results\n#pm25_results &lt;- pm25_workflow |&gt; \n#  tune_grid(\n#    resamples = pm25_vfold, \n#    grid = k_final_vals,\n#    metrics = metric_set(accuracy, bal_accuracy, recall, precision)) \n\n# load previously calculated tuning results\npm25_results &lt;- readRDS(\"data/processed/pm25_knn_tuning.rds\")\n\n# bal_accuracy because heavily skewed\nbalanced_accuracies &lt;- pm25_results |&gt;\n  collect_metrics() |&gt;\n  filter(.metric == \"bal_accuracy\")\nbalanced_accuracies\n\n\n# A tibble: 26 × 7\n   neighbors .metric      .estimator  mean     n  std_err .config         \n       &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;    &lt;dbl&gt; &lt;chr&gt;           \n 1         1 bal_accuracy binary     0.493     5 0.000841 pre0_mod01_post0\n 2         3 bal_accuracy binary     0.493     5 0.00144  pre0_mod02_post0\n 3         5 bal_accuracy binary     0.490     5 0.00226  pre0_mod03_post0\n 4         7 bal_accuracy binary     0.490     5 0.00201  pre0_mod04_post0\n 5         9 bal_accuracy binary     0.488     5 0.00226  pre0_mod05_post0\n 6        11 bal_accuracy binary     0.486     5 0.00225  pre0_mod06_post0\n 7        13 bal_accuracy binary     0.482     5 0.00177  pre0_mod07_post0\n 8        15 bal_accuracy binary     0.481     5 0.00279  pre0_mod08_post0\n 9        17 bal_accuracy binary     0.479     5 0.00303  pre0_mod09_post0\n10        19 bal_accuracy binary     0.479     5 0.00288  pre0_mod10_post0\n# ℹ 16 more rows\n\n\nCode\n# select K with highest balanced accuracy\nbest_k &lt;- balanced_accuracies |&gt;\n  arrange(desc(mean)) |&gt;\n  slice(1) |&gt;\n  pull(neighbors)\nbest_k\n\n\n[1] 3\n\n\n\nVisualization 1: Cross Validation Performance Across K Values\nBalanced cross-validation accuracy varied across values of K. The highest estimated balanced accuracy occurred at K = best_k so this value was selected for the final KNN classificaiton model.\nCross-validation performance was highest at approximately K = 3 and generally dereased as the K increased. Therefore, K = 3 was the best fittingvalue for the final KNN classifier. Yet, the balanced accuracy were close to 0.50, suggesting that the fire-count predictors alone may have limitations to distinguish High from Normal PM2.5 station days.\n\n\nCode\nbest_k_point &lt;- balanced_accuracies |&gt;\n  filter(neighbors == best_k)\n\naccuracy_vs_k &lt;- balanced_accuracies |&gt;\n  ggplot(aes(x = neighbors, y = mean)) +\n  geom_line() +\n  geom_point() +\n  geom_point(data = best_k_point, size = 3) +\n  labs(\n    title = \"Cross Validation Performance Across K Values\",\n    subtitle = \"KNN classification using 5-fold cross-validation\",\n    x = \"Number of Neighbours (K)\",\n    y = \"Balanced Accuracy\"\n  ) +\n  theme_minimal()\n\nggsave(\n  filename = \"figures/knn_k_tuning.png\",\n  plot = accuracy_vs_k,\n  width = 8,\n  height = 5,\n  dpi = 300\n)",
+    "crumbs": [
+      "KNN Classification"
+    ]
+  },
+  {
+    "objectID": "04-knn-classification.html#final-knn-model-k-3",
+    "href": "04-knn-classification.html#final-knn-model-k-3",
+    "title": "KNN-Classification",
+    "section": "Final KNN Model (K = 3)",
+    "text": "Final KNN Model (K = 3)\n\n\nCode\n# K = 3 and retrain KNN classifier\nfinal_knn_spec &lt;- nearest_neighbor(weight_func = \"rectangular\", neighbors = best_k) |&gt;\n  set_engine(\"kknn\") |&gt;\n  set_mode(\"classification\")\n\nfinal_pm25_workflow &lt;- workflow() |&gt;\n  add_recipe(pm25_recipe) |&gt;\n  add_model(final_knn_spec)\n\nfinal_knn_fit &lt;- final_pm25_workflow |&gt;\n  fit(data = pm25_train)\n\n\n\nTesting & Assessing\n\naccuracy\nbalanced accuracy\nprecision\nrecall\nconfusion matrix\nbaseline accuracy\n\n\n\nCode\npm25_test_predictions &lt;- predict(final_knn_fit, pm25_test) |&gt;\n  bind_cols(pm25_test)\n\npm25_test_predictions |&gt; head()\n\n# accuracy\nknn_accuracy &lt;- pm25_test_predictions |&gt;\n  accuracy(truth = pm25_level, estimate = .pred_class)\n\n# balanced accuracy\nknn_bal_accuracy &lt;- pm25_test_predictions |&gt;\n  bal_accuracy(truth = pm25_level, estimate = .pred_class)\n\n# precision for High PM2.5\nknn_precision &lt;- pm25_test_predictions |&gt;\n  precision(truth = pm25_level, estimate = .pred_class, event_level = \"first\")\n\n# recall for High PM2.5\nknn_recall &lt;- pm25_test_predictions |&gt;\n  recall(truth = pm25_level, estimate = .pred_class, event_level = \"first\")\n\nknn_accuracy\nknn_bal_accuracy\nknn_precision\nknn_recall\n\nknn_confusion_matrix &lt;- pm25_test_predictions |&gt;\n  conf_mat(truth = pm25_level, estimate = .pred_class)\nknn_confusion_matrix\n\n# Baseline Accuracy\nbaseline_accuracy &lt;- pm25_test |&gt;\n  count(pm25_level) |&gt;\n  mutate(proportion = n / sum(n)) |&gt;\n  summarise(baseline_accuracy = max(proportion))\nbaseline_accuracy\n\n\n\n\nCode\nknn_results_table &lt;- tibble(\n  Metric = c(\n    \"Accuracy\",\n    \"Balanced Accuracy\",\n    \"Precision\",\n    \"Recall\",\n    \"Baseline Accuracy\"\n  ),\n  Value = c(\n    knn_accuracy |&gt; pull(.estimate),\n    knn_bal_accuracy |&gt; pull(.estimate),\n    knn_precision |&gt; pull(.estimate),\n    knn_recall |&gt; pull(.estimate),\n    baseline_accuracy |&gt; pull(baseline_accuracy)\n  )\n)\n\nknn_results_clean_table &lt;- knn_results_table |&gt;\n  mutate(Value = round(Value, 3)) |&gt;\n  knitr::kable(caption = \"Test-set performance of the KNN classification model\")",
+    "crumbs": [
+      "KNN Classification"
+    ]
+  },
+  {
+    "objectID": "02-build-analysis-data.html",
+    "href": "02-build-analysis-data.html",
+    "title": "Build Analysis Dataset",
+    "section": "",
+    "text": "Transforms the raw datasets to processed ones.\nCode\nlibrary(tidyverse)\nlibrary(geosphere)\nThe table below summarizes the most important variables used throughout the data-building and analysis workflow.\nKey variables used throughout the analysis\n\n\nAir Quality\nFire\nRelationship\n\n\n\n\nStation_Date\nFire_ID\ndays_since_fire\n\n\nNAPS_ID\nFire_Year\nDistance_km\n\n\nStation_Name\nReport_Date\nfire_count_100km_{7/14/30}d\n\n\nLatitude\nFire_Date\nfire_count_250km_{7/14/30}d\n\n\nLongitude\nFire_Latitude\nfire_area_250km_{7/14/30}d\n\n\nmean_pm25\nFire_Longitude\nnearest_fire_km_{7/14/30}d\n\n\nmax_pm25\nSize_Ha\n\n\n\nhours_observed\nCause\n\n\n\nvalid_day\nResponse",
+    "crumbs": [
+      "Building the Dataset"
+    ]
+  },
+  {
+    "objectID": "02-build-analysis-data.html#checking",
+    "href": "02-build-analysis-data.html#checking",
+    "title": "Build Analysis Dataset",
+    "section": "1. Checking",
+    "text": "1. Checking\nCheck that the station’s coordinates does not change.\n\n\nCode\nstation_coordinate_check &lt;- pm25_daily |&gt;\n  distinct(NAPS_ID, Latitude, Longitude) |&gt;\n  count(NAPS_ID, name = \"coordinate_versions\") |&gt;\n  filter(coordinate_versions &gt; 1)\n\nstation_coordinate_check\n\n\n# A tibble: 0 × 2\n# ℹ 2 variables: NAPS_ID &lt;dbl&gt;, coordinate_versions &lt;int&gt;\n\n\nThe result confirms that the each station’s coordinates did not change.\nFor this, going to use geosphere.\n*Important: geosphere expects coordinates in c(Longitude, Latitude) order",
+    "crumbs": [
+      "Building the Dataset"
+    ]
+  },
+  {
+    "objectID": "02-build-analysis-data.html#take-station-locations-from-air-quality-data",
+    "href": "02-build-analysis-data.html#take-station-locations-from-air-quality-data",
+    "title": "Build Analysis Dataset",
+    "section": "2. Take station locations from Air Quality data",
+    "text": "2. Take station locations from Air Quality data\nExtract station ID, name, city, and location coordinates.\n\n\nCode\nstation_locations &lt;- pm25_daily |&gt;\n  distinct(\n    NAPS_ID,\n    Station_Name,\n    City,\n    Latitude,\n    Longitude\n  )\n\nglimpse(station_locations)\n\n\nRows: 60\nColumns: 5\n$ NAPS_ID      &lt;dbl&gt; 100103, 100110, 100111, 100119, 100121, 100125, 100127, 1…\n$ Station_Name &lt;chr&gt; \"NEW WESTMINSTER\", \"BURNABY - KENSINGTON PARK\", \"PORT MOO…\n$ City         &lt;chr&gt; \"METRO VANCOUVER - NEW WESTMINSTER (BC)\", \"METRO VANCOUVE…\n$ Latitude     &lt;dbl&gt; 49.22704, 49.27921, 49.28089, 49.21519, 49.30147, 49.1583…\n$ Longitude    &lt;dbl&gt; -122.8945, -122.9707, -122.8493, -122.9857, -123.0204, -1…\n\n\nCode\nnrow(station_locations)\n\n\n[1] 60\n\n\nAcross the three years, there were stations that only appear in only one or two years.",
+    "crumbs": [
+      "Building the Dataset"
+    ]
+  },
+  {
+    "objectID": "02-build-analysis-data.html#make-every-stationfire-pair",
+    "href": "02-build-analysis-data.html#make-every-stationfire-pair",
+    "title": "Build Analysis Dataset",
+    "section": "3. Make every station/fire pair",
+    "text": "3. Make every station/fire pair\n\n\nCode\n# create a dataframe of only usable data\nlarge_fires_temporal &lt;- large_fires_clean |&gt;\n  filter(!is.na(Fire_Date))\n\nglimpse(large_fires_temporal)\n\n\nAI was used to suggest using tidyr::crossing() to do cartesian product.\n\n\nCode\n# use cartesian product\nstation_fire_pairs &lt;- tidyr::crossing(\n  station_locations,\n  large_fires_temporal |&gt;\n    select(\n      Fire_ID,\n      Fire_Date,\n      Fire_Latitude,\n      Fire_Longitude,\n      Size_Ha\n    )\n)\nglimpse(station_fire_pairs)\n\n\nResults in 10 variables and 22,800 data.\n\nAI Audit\nWhat I want:\nStation A | data\nStation A | data\nStation A | data\n…(until it runs through large_fires_temporal rows)\nStation B | data\n…(same thing)\nThis means that each station is associated with all the data in large_fires_temporal. Thus, the following MUST BE TRUE:\n\n\nCode\nnrow(station_fire_pairs) == nrow(station_locations) * nrow(large_fires_temporal)\n\n\n[1] TRUE\n\n\n\n\n4. Calculate distance\nAI disclosure: ChatGPT was used to suggest using geosphere::distHarversine for geographic distance calculation. The function’s behaviour and assumptions were verified using geosphere documentations (Hijmans 2026).\n\n\nCode\nstation_fire_distances &lt;- station_fire_pairs |&gt;\n  mutate(\n    Distance_km =\n      geosphere::distHaversine(\n        cbind(Longitude, Latitude),\n        cbind(Fire_Longitude, Fire_Latitude)\n      ) / 1000\n  )\n\n\n\n\nAI-Audit\nLatitude and longitude represent angular geographic coordinates rather than distances in kilometres. Therefore, directly calculating Euclidean distance from differences in latitude and longitude cannot work.\ndistHaversine() function calculates the shortest distance between two points. It also accepts longitude and latitude coordinates and calculate spherically (Hijmans 2026). Ex. distHarversine(c(0,0), c(90,90)). It returns the distance in metres which is the reason for /1000 to convert to kilometres.\nTry a known value: following must be 111.3 km.\n\n\nCode\ngeosphere::distHaversine(\n  c(0, 0),\n  c(1, 0)\n) / 1000\n\n\n[1] 111.3195\n\n\n\n\nCode\n# check distances\nsummary(station_fire_distances$Distance_km)\n\n\n    Min.  1st Qu.   Median     Mean  3rd Qu.     Max. \n   1.618  324.217  492.015  540.061  713.532 1667.582 \n\n\nCode\nstation_fire_distances |&gt;\n  arrange(Distance_km) |&gt;\n  select(\n    NAPS_ID,\n    Station_Name,\n    Fire_ID,\n    Fire_Date,\n    Size_Ha,\n    Distance_km\n  ) |&gt;\n  slice_head(n = 10)\n\n\n# A tibble: 10 × 6\n   NAPS_ID Station_Name                   Fire_ID Fire_Date  Size_Ha Distance_km\n     &lt;dbl&gt; &lt;chr&gt;                          &lt;chr&gt;   &lt;date&gt;       &lt;dbl&gt;       &lt;dbl&gt;\n 1  101401 HOPE - AIRPORT                 BC-202… 2022-09-09    845         1.62\n 2  103021 SPARWOOD - CENTENNIAL SQUARE   BC-202… 2023-07-21   1295         3.26\n 3  105201 BURNS LAKE - FIRE CENTRE       BC-202… 2023-07-07   8044         7.88\n 4  100703 KELOWNA - 1450 KLO RD.         BC-202… 2023-08-17    733         8.05\n 5  104101 GRAND FORKS - CITY HALL        BC-202… 2022-10-09    203        10.0 \n 6  101904 CRANBROOK - MURIEL BAXTER      BC-202… 2022-08-01   1719.       12.0 \n 7  105101 HOUSTON - FIREHALL             BC-202… 2023-07-06   1445.       12.8 \n 8  100703 KELOWNA - 1450 KLO RD.         BC-202… 2023-08-15  13970.       12.9 \n 9  103905 KITIMAT - HAISLA VILLAGE       BC-202… 2023-07-07    200        13.8 \n10  102602 PORT ALBERNI - ALBERNI ELEMEN… BC-202… 2023-06-03    229        14.2",
+    "crumbs": [
+      "Building the Dataset"
+    ]
+  },
+  {
+    "objectID": "02-build-analysis-data.html#time-filtering",
+    "href": "02-build-analysis-data.html#time-filtering",
+    "title": "Build Analysis Dataset",
+    "section": "1. Time filtering",
+    "text": "1. Time filtering\nChecking if a fire have been active within 30 days of a PM2.5 data. If so, then register as a candidate.\n\n\nCode\n# calculates 30 days before Station_Date\nstation_day_fire_candidates &lt;- pm25_daily |&gt;\n  mutate(Window_Start = Station_Date - lubridate::days(30))\n# check\nstation_day_fire_candidates |&gt;\n  slice_sample(n=5) |&gt; \n  select(Window_Start, Station_Date)\n\n\nJoin station_fire_distances and station_day_fire_candidates. Comparing variables of the two datasets:\n\n\nCode\nall_columns &lt;- union(names(station_fire_distances), names(station_day_fire_candidates))\n\ndata.frame(\n  station_fire_distances = ifelse(\n    all_columns %in% names(station_fire_distances),\n    all_columns,\n    NA\n  ),\n  station_day_fire_candidates = ifelse(\n    all_columns %in% names(station_day_fire_candidates),\n    all_columns,\n    NA\n  ),\n  existInBoth = all_columns %in% names(station_fire_distances) &\n                all_columns %in% names(station_day_fire_candidates)\n)\n\n\nWe are selecting NAPS_ID, Fire_ID, Fire_Date, Size_Ha, Distance_km from the station-fire distances dataframe. Then joining it when each of its data matches with each of the data in fire-candidates-to-station dataframe.\nThe match is determined by the following conditions:\n\nNAPS_ID\nif Fire_Date (in station-fire-dist) is over or equal to Window_Start (in fire-candidate)\nif Fire_Date (in station-fire-dist) is before or equal to Station_Date (in fire-candidate)\n\n\n\nCode\nstation_day_fire_candidates &lt;- station_day_fire_candidates |&gt;\n  inner_join(\n    station_fire_distances |&gt; \n      select(NAPS_ID, Fire_ID, Fire_Date, Size_Ha, Distance_km),\n\n    by = join_by(\n      NAPS_ID, \n      Window_Start &lt;= Fire_Date, \n      Station_Date &gt;= Fire_Date\n    ),\n    relationship = \"many-to-many\" # since each station-day can have many fire\n  ) |&gt;\n  mutate(days_since_fire = as.numeric(Station_Date - Fire_Date))\n\nglimpse(station_day_fire_candidates)\n\n\n\n\nCode\nsummary(station_day_fire_candidates$days_since_fire)\n\n\n   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. \n      0       7      15      15      23      30 \n\n\nCode\nall(\n  station_day_fire_candidates$days_since_fire &gt;= 0 &\n  station_day_fire_candidates$days_since_fire &lt;= 30\n)\n\n\n[1] TRUE\n\n\nThese verify that the days_since_fire falls between 0 to 30.\n\nWhat does station_day_fire_candidates actually show?\nA data: one station-day paired with one fire reported in the previous 30 days\nFor example, on the same date on the same station, there will be many fire associated with it.\n\n\nCode\nstation_day_fire_candidates |&gt;\n  arrange(Station_Date, Station_Name) |&gt;\n  select(Station_Date, Station_Name, Fire_ID, days_since_fire, Distance_km) |&gt;\n  head()\n\n\n# A tibble: 6 × 5\n  Station_Date Station_Name              Fire_ID     days_since_fire Distance_km\n  &lt;date&gt;       &lt;chr&gt;                     &lt;chr&gt;                 &lt;dbl&gt;       &lt;dbl&gt;\n1 2022-05-31   ABBOTSFORD - AIRPORT - 3  BC-2022-20…               0       1229.\n2 2022-05-31   ABBOTSFORD - MILL LAKE    BC-2022-20…               0       1226.\n3 2022-05-31   AGASSIZ - 7170 CHEAM AVE. BC-2022-20…               0       1201.\n4 2022-05-31   BURNABY - KENSINGTON PARK BC-2022-20…               0       1206.\n5 2022-05-31   BURNABY - SOUTH           BC-2022-20…               0       1213.\n6 2022-05-31   BURNS LAKE - FIRE CENTRE  BC-2022-20…               0        728.\n\n\nExample of an extreme PM2.5 events (Kamloops case - found in file 01). It shows that there really was a cluster of large-fire reports during one period.\n\n\nCode\nstation_day_fire_candidates |&gt;\n  filter(\n    Station_Date == as.Date(\"2023-08-21\"),\n    str_detect(Station_Name, \"KAMLOOPS\")\n  ) |&gt;\n  arrange(Distance_km) |&gt;\n  transmute(\n    Fire_ID,\n    Fire_Date,\n    days_since_fire,\n    Size_Ha,\n    Distance_km = round(Distance_km, 1)\n  ) |&gt;\n  slice_head(n = 10)\n\n\n# A tibble: 10 × 5\n   Fire_ID             Fire_Date  days_since_fire Size_Ha Distance_km\n   &lt;chr&gt;               &lt;date&gt;               &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;\n 1 BC-2023-2023-K42815 2023-08-18               3    373.        96  \n 2 BC-2023-2023-K52767 2023-08-15               6  13970.        98.8\n 3 BC-2023-2023-K52808 2023-08-17               4    733        103. \n 4 BC-2023-2023-K72705 2023-08-09              12   1016.       124. \n 5 BC-2023-2023-K52813 2023-08-18               3   2044.       159. \n 6 BC-2023-2023-K52125 2023-07-22              30  46504.       168. \n 7 BC-2023-2023-N52372 2023-07-30              22    200        184. \n 8 BC-2023-2023-V12722 2023-08-13               8   1518.       187. \n 9 BC-2023-2023-G32441 2023-07-25              27    231        190. \n10 BC-2023-2023-K52318 2023-07-29              23   7061.       196.",
+    "crumbs": [
+      "Building the Dataset"
+    ]
+  },
+  {
+    "objectID": "02-build-analysis-data.html#aggregating-fire-features",
+    "href": "02-build-analysis-data.html#aggregating-fire-features",
+    "title": "Build Analysis Dataset",
+    "section": "2. Aggregating fire features",
+    "text": "2. Aggregating fire features\nCurrently, Kamloops station on August 21 might appear 20+ times because it can be paired with 20+ different fires. Instead, we want one data: Kamloops + 2023-0-21 to contain a SUMMARY of all relevant fires.\n\nClassify\nFirst, create variables that classifies distances. When we ask: How many fires were within 100 km and 14 days?, we can answer simply.\n\n\nCode\nstation_day_fire_candidates &lt;- station_day_fire_candidates |&gt;\n  mutate(\n    within_7_days = days_since_fire &lt;= 7,\n    within_14_days = days_since_fire &lt;= 14,\n    within_30_days = days_since_fire &lt;= 30,\n\n    within_100_km = Distance_km &lt;= 100,\n    within_250_km = Distance_km &lt;= 250\n  )\n\n\nCheck if it works, must get TRUE for all.\n\n\nCode\nstation_day_fire_candidates |&gt;\n  summarise(\n    all_7_within_30 = all(!within_7_days | within_30_days),\n    all_14_within_30 = all(!within_14_days | within_30_days),\n    all_100_within_250 = all(!within_100_km | within_250_km)\n  )\n\n\n# A tibble: 1 × 3\n  all_7_within_30 all_14_within_30 all_100_within_250\n  &lt;lgl&gt;           &lt;lgl&gt;            &lt;lgl&gt;             \n1 TRUE            TRUE             TRUE              \n\n\nCode\nstation_day_fire_candidates |&gt;\n  summarise(\n    within_7_days = sum(within_7_days),\n    within_14_days = sum(within_14_days),\n    within_30_days = sum(within_30_days),\n\n    within_100_km = sum(within_100_km),\n    within_250_km = sum(within_250_km)\n  )\n\n\n# A tibble: 1 × 5\n  within_7_days within_14_days within_30_days within_100_km within_250_km\n          &lt;int&gt;          &lt;int&gt;          &lt;int&gt;         &lt;int&gt;         &lt;int&gt;\n1        170056         318855         658967         15965        120280\n\n\n\n\nAggregate\nSecond and importantly, collapse all these fire features into one row.\n\n\nCode\nstation_day_fire_features &lt;- station_day_fire_candidates |&gt;\n  group_by(NAPS_ID, Station_Date) |&gt;\n  summarise(\n    # fire counts within 100 km\n    fire_count_100km_7d = sum(within_100_km & within_7_days),\n    fire_count_100km_14d = sum(within_100_km & within_14_days),\n    fire_count_100km_30d = sum(within_100_km & within_30_days),\n\n    # fire counts within 250 km\n    fire_count_250km_7d = sum(within_250_km & within_7_days),\n    fire_count_250km_14d = sum(within_250_km & within_14_days),\n    fire_count_250km_30d = sum(within_250_km & within_30_days),\n\n    # total size of nearby fires - for rough estimate of recently reported large-fire area nearby\n    fire_area_250km_7d = sum(Size_Ha[within_250_km & within_7_days]),\n    fire_area_250km_14d = sum(Size_Ha[within_250_km & within_14_days]),\n    fire_area_250km_30d = sum(Size_Ha[within_250_km & within_30_days]),\n\n    # nearest fire within each time window\n    nearest_fire_km_7d =\n      if (any(within_7_days)) {\n        min(Distance_km[within_7_days])\n      } else {\n        NA_real_\n      },\n    nearest_fire_km_14d =\n      if (any(within_14_days)) {\n        min(Distance_km[within_14_days])\n      } else {\n        NA_real_\n      },\n    nearest_fire_km_30d = min(Distance_km),\n\n    .groups = \"drop\"\n  )\n\nglimpse(station_day_fire_features)\n\n\n\n\nCode\nstation_day_fire_features |&gt;\n  arrange(desc(fire_count_250km_14d)) |&gt;\n  slice_head(n = 10)\n\n\n# A tibble: 10 × 14\n   NAPS_ID Station_Date fire_count_100km_7d fire_count_100km_14d\n     &lt;dbl&gt; &lt;date&gt;                     &lt;int&gt;                &lt;int&gt;\n 1  105201 2023-07-15                    11                   23\n 2  105201 2023-07-17                     2                   22\n 3  105201 2023-07-18                     0                   22\n 4  105201 2023-07-19                     0                   22\n 5  105201 2023-07-20                     0                   22\n 6  105201 2023-07-12                    22                   23\n 7  105201 2023-07-13                    22                   23\n 8  105201 2023-07-14                    21                   23\n 9  105201 2023-07-16                     5                   22\n10  105201 2023-07-21                     0                   21\n# ℹ 10 more variables: fire_count_100km_30d &lt;int&gt;, fire_count_250km_7d &lt;int&gt;,\n#   fire_count_250km_14d &lt;int&gt;, fire_count_250km_30d &lt;int&gt;,\n#   fire_area_250km_7d &lt;dbl&gt;, fire_area_250km_14d &lt;dbl&gt;,\n#   fire_area_250km_30d &lt;dbl&gt;, nearest_fire_km_7d &lt;dbl&gt;,\n#   nearest_fire_km_14d &lt;dbl&gt;, nearest_fire_km_30d &lt;dbl&gt;\n\n\nLast, verify. The following must show 0.\n\n\nCode\nstation_day_fire_features |&gt;\n  count(NAPS_ID, Station_Date) |&gt;\n  filter(n &gt; 1)\n\n\n# A tibble: 0 × 3\n# ℹ 3 variables: NAPS_ID &lt;dbl&gt;, Station_Date &lt;date&gt;, n &lt;int&gt;\n\n\nThis confirms that each row is has a unique station ID and station observed date as we intended: NAPS_ID + STATION_DATE + Summary of fires.\nData Audit\nfire_area_ is not reliable for prediction. The area of fire is always changing but this value is not since CNFDB dataset gives one size for each fire.\nAuditing, following must all be TRUE.\n\n\nCode\nstation_day_fire_features |&gt;\n  summarise(\n    # count audit\n    count_100_dist_250 = all(fire_count_100km_14d &lt;= fire_count_250km_14d),\n    count_7_days_14 = all(fire_count_250km_7d &lt;= fire_count_250km_14d),\n    count_14_days_30 = all(fire_count_250km_14d &lt;= fire_count_250km_30d),\n\n    # size audit\n    area_7_days_14 = all(fire_area_250km_7d &lt;= fire_area_250km_14d),\n    area_14_days_30 = all(fire_area_250km_14d &lt;= fire_area_250km_30d),\n\n    # nearest value must be either same or less with greater data including the same ones\n    nearest_30_days_14 = all(is.na(nearest_fire_km_14d) | nearest_fire_km_30d &lt;= nearest_fire_km_14d)\n  )\n\n\n# A tibble: 1 × 6\n  count_100_dist_250 count_7_days_14 count_14_days_30 area_7_days_14\n  &lt;lgl&gt;              &lt;lgl&gt;           &lt;lgl&gt;            &lt;lgl&gt;         \n1 TRUE               TRUE            TRUE             TRUE          \n# ℹ 2 more variables: area_14_days_30 &lt;lgl&gt;, nearest_30_days_14 &lt;lgl&gt;",
+    "crumbs": [
+      "Building the Dataset"
+    ]
+  },
+  {
+    "objectID": "02-build-analysis-data.html#join-the-fire-features-to-pm2.5",
+    "href": "02-build-analysis-data.html#join-the-fire-features-to-pm2.5",
+    "title": "Build Analysis Dataset",
+    "section": "Join the fire features to PM2.5",
+    "text": "Join the fire features to PM2.5\n\n\nCode\nanalysis_daily &lt;- pm25_daily |&gt;\n  left_join(\n    station_day_fire_features,\n    by = c(\n      \"NAPS_ID\",\n      \"Station_Date\"\n    )\n  )\n\nglimpse(analysis_daily)\n\n\nIf no qualifying fires exist, fire_count_ and fire_area_ shouldn’t be NA; it should be 0. Yet, nearest_fire_distance_ are still NA because if it is 0, it would mean the fire is located at the monitoring station.\nAI Disclosure: ChatGPT was used to find the code like starts_with() and ~ replace_na(). It helped the code to be efficient as columns started with the same part and had to replace the same value: NA to 0.\n\n\nCode\nanalysis_daily &lt;- analysis_daily |&gt;\n  mutate(\n    across(\n      starts_with(\"fire_count_\"),\n      ~ replace_na(.x, 0L)\n    ),\n\n    across(\n      starts_with(\"fire_area_\"),\n      ~ replace_na(.x, 0)\n    )\n  )\n\n\nAuditing,\n\n\nCode\n# check that it didn't lose rows\nnrow(analysis_daily) == nrow(pm25_daily)\n\n\n[1] TRUE\n\n\nCode\n# check that the number NA values is 0\nanalysis_daily |&gt;\n  summarise(\n    fire_count_ = sum(is.na(pick(starts_with(\"fire_count_\")))),\n    fire_area_ = sum(is.na(pick(starts_with(\"fire_area_\"))))\n  )\n\n\n# A tibble: 1 × 2\n  fire_count_ fire_area_\n        &lt;int&gt;      &lt;int&gt;\n1           0          0\n\n\nCode\nglimpse(analysis_daily)\n\n\nRows: 61,743\nColumns: 29\n$ Year                 &lt;dbl&gt; 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2022, 2…\n$ Station_Date         &lt;date&gt; 2022-01-01, 2022-01-01, 2022-01-01, 2022-01-01, …\n$ NAPS_ID              &lt;dbl&gt; 100103, 100110, 100111, 100119, 100121, 100125, 1…\n$ Station_Name         &lt;chr&gt; \"NEW WESTMINSTER\", \"BURNABY - KENSINGTON PARK\", \"…\n$ City                 &lt;chr&gt; \"METRO VANCOUVER - NEW WESTMINSTER (BC)\", \"METRO …\n$ Latitude             &lt;dbl&gt; 49.22704, 49.27921, 49.28089, 49.21519, 49.30147,…\n$ Longitude            &lt;dbl&gt; -122.8945, -122.9707, -122.8493, -122.9857, -123.…\n$ Elevation_m          &lt;dbl&gt; 45, 104, 6, 122, 4, 113, 79, 4, 71, 1, 65, 52, 30…\n$ Site_Type            &lt;chr&gt; \"PE\", \"T\", \"PS\", \"PE\", \"PE\", \"PE\", \"T\", \"PE\", \"PE…\n$ Urbanization         &lt;chr&gt; \"LU\", \"LU\", \"LU\", \"LU\", \"LU\", \"LU\", \"LU\", \"LU\", \"…\n$ Land_Use             &lt;chr&gt; \"R\", \"R\", \"W\", \"R\", \"I\", \"R\", \"R\", \"R\", \"R\", \"C\",…\n$ AQMS_Airzone         &lt;chr&gt; \"British Columbia - Lower Fraser Valley\", \"Britis…\n$ hours_observed       &lt;int&gt; 24, 24, 24, 24, 24, 24, 24, 24, 24, 24, 23, 24, 2…\n$ mean_pm25            &lt;dbl&gt; 5.833333, 2.916667, 6.916667, 1.708333, 3.250000,…\n$ max_pm25             &lt;dbl&gt; 9, 12, 21, 3, 7, 11, 6, 7, 7, 12, 13, 5, 52, 12, …\n$ Month                &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1…\n$ valid_day            &lt;lgl&gt; TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, T…\n$ fire_count_100km_7d  &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…\n$ fire_count_100km_14d &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…\n$ fire_count_100km_30d &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…\n$ fire_count_250km_7d  &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…\n$ fire_count_250km_14d &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…\n$ fire_count_250km_30d &lt;int&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…\n$ fire_area_250km_7d   &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…\n$ fire_area_250km_14d  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…\n$ fire_area_250km_30d  &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…\n$ nearest_fire_km_7d   &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…\n$ nearest_fire_km_14d  &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…\n$ nearest_fire_km_30d  &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…\n\n\nVerified that no rows were lost (TRUE) and all NA values in fire_count_ and fire_area_ were replaced by 0.",
+    "crumbs": [
+      "Building the Dataset"
+    ]
+  },
+  {
+    "objectID": "02-build-analysis-data.html#inspect-the-kamloops-fort-st.-john",
+    "href": "02-build-analysis-data.html#inspect-the-kamloops-fort-st.-john",
+    "title": "Build Analysis Dataset",
+    "section": "Inspect the Kamloops & Fort St. John",
+    "text": "Inspect the Kamloops & Fort St. John\nWe already have data about them from our file 01. Compare to check that every data have been preserved.\n\n\nCode\n# Fort St. John\ncase_study_fires &lt;- station_day_fire_candidates |&gt;\n  filter(\n    (\n      Station_Date == as.Date(\"2023-08-21\") &\n      str_detect(Station_Name, \"KAMLOOPS\")\n    ) |\n    (\n      Station_Date == as.Date(\"2023-05-19\") &\n      str_detect(Station_Name, \"FORT ST. JOHN\")\n    )\n  ) |&gt;\n  filter(\n    within_250_km,\n    within_14_days\n  ) |&gt;\n  select(\n    Station_Date,\n    Station_Name,\n    Fire_ID,\n    Fire_Date,\n    days_since_fire,\n    Size_Ha,\n    Distance_km\n  )\ncase_study_fires\n\n\n# A tibble: 10 × 7\n   Station_Date Station_Name          Fire_ID Fire_Date  days_since_fire Size_Ha\n   &lt;date&gt;       &lt;chr&gt;                 &lt;chr&gt;   &lt;date&gt;               &lt;dbl&gt;   &lt;dbl&gt;\n 1 2023-05-19   FORT ST. JOHN - LEAR… BC-202… 2023-05-05              14   2947 \n 2 2023-05-19   FORT ST. JOHN - LEAR… BC-202… 2023-05-12               7 619072.\n 3 2023-05-19   FORT ST. JOHN - LEAR… BC-202… 2023-05-13               6  29506.\n 4 2023-05-19   FORT ST. JOHN - LEAR… BC-202… 2023-05-11               8  42838.\n 5 2023-08-21   KAMLOOPS - FEDERAL B… BC-202… 2023-08-18               3    373.\n 6 2023-08-21   KAMLOOPS - FEDERAL B… BC-202… 2023-08-15               6  13970.\n 7 2023-08-21   KAMLOOPS - FEDERAL B… BC-202… 2023-08-17               4    733 \n 8 2023-08-21   KAMLOOPS - FEDERAL B… BC-202… 2023-08-18               3   2044.\n 9 2023-08-21   KAMLOOPS - FEDERAL B… BC-202… 2023-08-09              12   1016.\n10 2023-08-21   KAMLOOPS - FEDERAL B… BC-202… 2023-08-13               8   1518.\n# ℹ 1 more variable: Distance_km &lt;dbl&gt;\n\n\n\nAudit: PM2.5 Daily Maximum\nError: For Kamloops and Fort St. John stations, max_pm25 are supposed to be 982 and 2112 as we found in file 01, but this data shows that they are 596 and 461 – equal to the mean_pm25.\nRecalculating max_pm25 and mean_pm25 on raw-joined data (pm25_joined) showed that the raw data was preserved. Reviewing the aggregation code showed that mean() had accidentally been used for both variables – a copy-past error. The max_pm25 was corrected to use max().\nImportant: Always compare processed results againt known raw observations. Code may execute successfully but will not gurantee that correctness.",
+    "crumbs": [
+      "Building the Dataset"
+    ]
+  },
+  {
+    "objectID": "02-build-analysis-data.html#validation",
+    "href": "02-build-analysis-data.html#validation",
+    "title": "Build Analysis Dataset",
+    "section": "Validation",
+    "text": "Validation\n\nKamloops Station\nFor the validation, we will manually find out fire_count_250km_14d and compare with the actual value.\n\n\nCode\nkamloops_manual_check &lt;- station_day_fire_candidates |&gt;\n  filter(\n    Station_Date == as.Date(\"2023-08-21\"),\n    str_detect(Station_Name, \"KAMLOOPS\")\n  ) |&gt;\n  summarise(\n    manual_count_250km_14d = sum(within_250_km & within_14_days),\n    manual_area_250km_14d = sum(Size_Ha[within_250_km & within_14_days]),\n    manual_nearest_fire_14d = min(Distance_km[within_14_days])\n  )\n\nkamloops_actual_values &lt;- analysis_daily |&gt;\n  filter(\n    Station_Date == as.Date(\"2023-08-21\"),\n    str_detect(Station_Name, \"KAMLOOPS\")\n  ) |&gt;\n  select(\n    fire_count_250km_14d,\n    fire_area_250km_14d,\n    nearest_fire_km_14d\n  )\n\n# manual\nkamloops_manual_check\n\n\n# A tibble: 1 × 3\n  manual_count_250km_14d manual_area_250km_14d manual_nearest_fire_14d\n                   &lt;int&gt;                 &lt;dbl&gt;                   &lt;dbl&gt;\n1                      6                 19653                    96.0\n\n\nCode\n# actual\nkamloops_actual_values\n\n\n# A tibble: 1 × 3\n  fire_count_250km_14d fire_area_250km_14d nearest_fire_km_14d\n                 &lt;int&gt;               &lt;dbl&gt;               &lt;dbl&gt;\n1                    6               19653                96.0\n\n\nThey are the same; validated. Plus, we can see that the area value is quite high.",
+    "crumbs": [
+      "Building the Dataset"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html",
+    "href": "01-explore-data.html",
+    "title": "Exploring Data",
+    "section": "",
+    "text": "Code\nlibrary(tidyverse)",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#inspect-air-quality-datasets",
+    "href": "01-explore-data.html#inspect-air-quality-datasets",
+    "title": "Exploring Data",
+    "section": "Inspect Air Quality Datasets",
+    "text": "Inspect Air Quality Datasets\n\n\nCode\npm25_2023 &lt;- read_csv(\"data/raw/airquality/2023/data_2023.csv\")\nstations_2023 &lt;- read_csv(\"data/raw/airquality/2023/stations_2023.csv\")\nn_distinct(pm25_2023$NAPS_ID) # monitoring stations\n\n\ndata_2023.csv:\nData has 481800 hourly PM2.5 observations across BC for 2023 (8 columns). Each row shows one PM2.5 concentration measurement, one monitoring station, one date, start, and end time.\n* Important: NAPS_ID -&gt; can connect to stations_2023.csv\nstations_2023.csv:\nObservations are recorded by 55 monitoring stations.\nUseful fields out of 43:\n\nNAPS_ID\n\nStation_Name\n\nCity\n\nLatitude: will be used to calculate distances from nearby fires\n\nLongitude: same as latitude\n\nElevation_m\n\nSite_Type\n\nUrbanization\n\nLand_Use\n\nAQMS_Airzone\n\n\nResearch\nParticulate Matter (PM) is a complex mix of solids and aerosols. PM2.5 describes the fine particulate matter that are 2.5 microns or less in diameter (PM2.5).\nAmbient Air Quality Standard in BC:\n24-Hour Average: 25 µg/m^3\nAnnual: 8 µg/m^3 (Government of British Columbia 2026)",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#joined-station-and-pm2.5",
+    "href": "01-explore-data.html#joined-station-and-pm2.5",
+    "title": "Exploring Data",
+    "section": "Joined Station and PM2.5",
+    "text": "Joined Station and PM2.5\n\n\nCode\n# check that the number and IDs of monitoring stations match\nnrow(stations_2023)\nn_distinct(stations_2023$NAPS_ID)\n\nanti_join(\n  pm25_2023 |&gt; distinct(NAPS_ID),\n  stations_2023 |&gt; distinct(NAPS_ID),\n  by = \"NAPS_ID\"\n)\n\n\n\n\nCode\nstation_info_2023 &lt;- stations_2023 |&gt;\n  select(\n    NAPS_ID,\n    Station_Name,\n    City,\n    Latitude,\n    Longitude,\n    Elevation_m,\n    Site_Type,\n    Urbanization,\n    Land_Use,\n    AQMS_Airzone\n  )\nglimpse(station_info_2023)\n\n\n\n\nCode\npm25_2023_joined &lt;- pm25_2023 |&gt;\n  left_join(station_info_2023, by = \"NAPS_ID\")\nglimpse(pm25_2023_joined) # result should have 10+8-1=17 columns\n\n\n\n1. How much is PM2.5 data missing?\n\n\nCode\npm25_2023_joined |&gt;\n  summarise(\n    total_rows = n(),\n    missing_concentration = sum(is.na(Concentration)),\n    percent_missing = mean(is.na(Concentration)) * 100\n  )\n\n\n27,784 rows missing concentration (5.77%)\n\n\n2. PM2.5 concentration distribution\n\n\nCode\nsummary(pm25_2023_joined$Concentration)\n\n\n    Min.  1st Qu.   Median     Mean  3rd Qu.     Max.      NAs \n   0.000    2.000    5.000    7.321    8.000 2112.000    27784 \n\n\nMax of 2112 is very big compared to others.\n\n\nCode\npm25_2023_joined |&gt;\n  filter(!is.na(Concentration)) |&gt;\n  arrange(desc(Concentration)) |&gt;\n  select(\n    Date_yyyy_mm_dd,\n    Start_Time_Local_Standard,\n    Concentration,\n    Station_Name,\n    City,\n    NAPS_ID\n  ) |&gt;\n  slice_head(n = 20)\n\n\n\n\nCode\npm25_2023_joined |&gt;\n  summarise(\n    zero = sum(Concentration == 0, na.rm=TRUE),\n    negative = sum(Concentration &lt; 0, na.rm=TRUE),\n    above_100 = sum(Concentration &gt; 100, na.rm=TRUE),\n    above_500 = sum(Concentration &gt; 500, na.rm=TRUE),\n    above_1000 = sum(Concentration &gt; 1000, na.rm=TRUE)\n  )\n\n\nHere, though 2112 is an extreme value, the surrounding observations show sustained high concentrations at the same station over consecutive hours. Therefore, it should not be removed as an erroneous outlier. Note: Fort St. John Max PM2.5 - 2112 and Kamloops Max PM2.5 - 982.\n\n\n3. Are Pollutant and Units actually constant?\n\n\nCode\npm25_2023_joined |&gt;\n  count(Pollutant)\n\npm25_2023_joined |&gt;\n  count(Units)\n\n\nUnits have 27,784 missing values and 454,016 rows as µg/m^3 while Pollutant is constant Note: 27,784 rows of Units = 27,784 rows of Concentration are N/A\n\n\nCode\npm25_2023_joined |&gt;\n  summarise(\n    mismatched_missing = sum(is.na(Concentration) != is.na(Units))\n  )\n\n\nResult of 0 verifies that NAPS leaves Units blank when PM2.5 is missing.\n\n\n4. Missing Data by Station\n\n\nCode\npm25_2023_joined |&gt;\n  group_by(NAPS_ID, Station_Name) |&gt;\n  summarise(\n    observations = n(),\n    missing = sum(is.na(Concentration)),\n    percent_missing = mean(is.na(Concentration)) * 100\n  ) |&gt;\n  arrange(desc(percent_missing))\n\n\nQuite high for few ie. Powell River… has 40.8% missing, and the total missing is 5.77%. A station like Powell River might distort station specific analyses.\nUsing a heat map, check whether missing is a random hourly equipment gaps throughout year (less concerning) or an entire month worth of data is missing (concerning).\nFigure 1: Missing PM2.5 Measurements by Station and Month\nStations have missingness in subsequent months. Thus, it is not just random hourly equipment gaps. For example, Powell River Station has a high concentration of missing values from August to December.\n\n\nCode\n# separate month from date and calculate percent missing\npm25_missing_monthly &lt;- pm25_2023_joined |&gt;\n  mutate(Month = lubridate::month(Date_yyyy_mm_dd, label = TRUE)) |&gt;\n  group_by(Station_Name, Month) |&gt;\n  summarise(\n    percent_missing = mean(is.na(Concentration)) * 100,\n    .groups = \"drop\"\n  )\n\n\n\n\nCode\n# showing only the top \ntop_missing_stations &lt;- pm25_2023_joined |&gt;\n  group_by(Station_Name) |&gt;\n  summarise(\n    percent_missing = mean(is.na(Concentration)) * 100,\n    .groups = \"drop\"\n  ) |&gt;\n  arrange(desc(percent_missing)) |&gt;\n  slice_head(n = 15) |&gt;\n  pull(Station_Name)\npm25_missing_monthly_top &lt;- pm25_missing_monthly |&gt; filter(Station_Name %in% top_missing_stations)\n\npm25_missing_monthly_top_plot &lt;- pm25_missing_monthly_top |&gt;\n  ggplot(aes(\n    x = Month,\n    y = fct_reorder(Station_Name, percent_missing, .fun = max),\n    fill = percent_missing\n  )) +\n  geom_tile() +\n  labs(\n    title = \"Monthly Missing PM2.5 for Stations with the Highest Missingness\",\n    subtitle = \"British Columbia, 2023\",\n    x = \"Month\",\n    y = \"Monitoring station\",\n    fill = \"Missing (%)\"\n  ) +\n  theme_minimal() +\n  theme(\n    axis.text.x = element_text(angle = 45, hjust = 1, size = 8),\n    axis.text.y = element_text(size = 7),\n    plot.title = element_text(hjust = 0.5),\n    plot.subtitle = element_text(hjust = 0.5))\npm25_missing_monthly_top_plot",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#inspect-data",
+    "href": "01-explore-data.html#inspect-data",
+    "title": "Exploring Data",
+    "section": "Inspect Data",
+    "text": "Inspect Data\n\n\nCode\nlarge_fires &lt;- read_csv(\"data/raw/wildfire/NFDB_point_large_fires.txt\")\nglimpse(large_fires)\nproblems(large_fires) \n\n# fix wrong predetermined type\nlarge_fires &lt;- read_csv(\n  \"data/raw/wildfire/NFDB_point_large_fires.txt\",\n  col_types = cols(ATTK_DATE = col_datetime()))\nproblems(large_fires)\n\n#| output\nhead(large_fires)",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#bc-fires",
+    "href": "01-explore-data.html#bc-fires",
+    "title": "Exploring Data",
+    "section": "2022-2024 BC Fires",
+    "text": "2022-2024 BC Fires\n\n\nCode\n# large fires in BC during 2022-2024\nlarge_fires |&gt; count(SRC_AGENCY, sort=TRUE)\nlarge_fires_bc &lt;- large_fires |&gt;\n  filter(SRC_AGENCY == \"BC\", YEAR %in% 2022:2024)\n\nglimpse(large_fires_bc)\n\n\nTotal BC Large Fires (1950-2025): 3209\nTotal BC Large Fires (2022-2024): 382\n\n\nCode\nlarge_fires_bc |&gt;\n  select(REP_DATE) |&gt;\n  arrange(REP_DATE) |&gt;\n  head()\n\n\n# A tibble: 6 × 1\n  REP_DATE           \n  &lt;dttm&gt;             \n1 2022-05-31 00:00:00\n2 2022-06-03 00:00:00\n3 2022-06-16 00:00:00\n4 2022-06-23 00:00:00\n5 2022-06-23 00:00:00\n6 2022-06-28 00:00:00\n\n\nCode\nlarge_fires_bc |&gt;\n  count(YEAR)\n\n\n# A tibble: 3 × 2\n   YEAR     n\n  &lt;dbl&gt; &lt;int&gt;\n1  2022    63\n2  2023   219\n3  2024   100\n\n\nCode\nlarge_fires_bc |&gt;\n  count(FIRE_TYPE, sort=TRUE)\n\n\n# A tibble: 1 × 2\n  FIRE_TYPE     n\n  &lt;chr&gt;     &lt;int&gt;\n1 Fire        382\n\n\nCode\nlarge_fires_bc |&gt;\n  count(CAUSE22, sort=TRUE)\n\n\n# A tibble: 3 × 2\n  CAUSE22     n\n  &lt;chr&gt;   &lt;int&gt;\n1 N         335\n2 H          36\n3 U          11\n\n\nREP_DATE arrangement shows that the first observation of wildfire in BC (2022-2024) starts on May 31st, 2022.\nYear shows 2023 has the greatest amount of fires.\nFIRE_TYPE does not provide useful information for BC data.\nFrom the NFDB_point_metadata.pdf, CAUSE:\n[N] Natural/Lightning caused\n[H] Human caused\n[U] Unknown cause\n* Remember to change these for processed data\nFigure 2: Large fires by year\nFrom BC large fires by year 2022-2024, 2023 had a much more fires than in other two years. 2023 was also the year when the extreme values of PM2.5 appeared.\n\n\nCode\nlarge_fires_bc |&gt;\n  count(YEAR) |&gt;\n  ggplot(aes(x = factor(YEAR), y = n)) +\n  geom_col() +\n  labs(\n    title = \"Number of Large Fire Records in BC by Year\",\n    x = \"Year\",\n    y = \"Number of large fires\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\n\n\nCode\nlarge_fires_bc |&gt;\n  summarise(\n    fires = n(),\n    missing_latitude = sum(is.na(LATITUDE)),\n    missing_longitude = sum(is.na(LONGITUDE)),\n    missing_date = sum(is.na(REP_DATE)),\n    missing_size = sum(is.na(SIZE_HA))\n  )\n\n\n# A tibble: 1 × 5\n  fires missing_latitude missing_longitude missing_date missing_size\n  &lt;int&gt;            &lt;int&gt;             &lt;int&gt;        &lt;int&gt;        &lt;int&gt;\n1   382                0                 0            0            0\n\n\nMissing values of 0 is great as latitude, longitude, rep_date, size_ha will be useful in calculating distances between fire and the station.\n\n\nCode\nlarge_fires_bc |&gt;\n  count(PRESCRIBED, sort=TRUE)\n\n\n# A tibble: 1 × 2\n  PRESCRIBED     n\n  &lt;chr&gt;      &lt;int&gt;\n1 &lt;NA&gt;         382\n\n\nCode\nlarge_fires_bc |&gt;\n  count(MORE_INFO, sort=TRUE)\n\n\n# A tibble: 281 × 2\n   MORE_INFO                                            n\n   &lt;chr&gt;                                            &lt;int&gt;\n 1 &lt;NA&gt;                                               101\n 2 Skudamore Creek                                      2\n 3 0.5 km N Davis Lake - MODIFIED RESPONSE              1\n 4 0.8 KM S Oppy Lake - MODIFIED RESPONSE               1\n 5 1 Mile SW of the Turnagain & Kachinka Confurance     1\n 6 1.1km NW of Elbow Lake                               1\n 7 1.5 KM NE of Lonesome Lake                           1\n 8 1.5 km N of Nadina River                             1\n 9 1.5 km NE of Taltapin Lake                           1\n10 1.5km SE of Gatcho Lake                              1\n# ℹ 271 more rows\n\n\nCode\nlarge_fires_bc |&gt;\n  count(RESPONSE, sort = TRUE)\n\n\n# A tibble: 4 × 2\n  RESPONSE     n\n  &lt;chr&gt;    &lt;int&gt;\n1 FUL        142\n2 MOD        115\n3 MON        102\n4 &lt;NA&gt;        23\n\n\nWe can see that PRESCRIBED gives non-usable information for BC records. MORE_INFO shows description of location having 281 different values. RESPONSE (from NFDB_points_metadata.pdf) has three classes: [FUL] Full response, [MOD] Modified response, [MON] Monitor.\n\n\nCode\nlarge_fires_bc |&gt;\n  summarise(\n    min_size_ha = min(SIZE_HA),\n    median_size_ha = median(SIZE_HA),\n    mean_size_ha = mean(SIZE_HA),\n    max_size_ha = max(SIZE_HA)\n  )\n\n\n# A tibble: 1 × 4\n  min_size_ha median_size_ha mean_size_ha max_size_ha\n        &lt;dbl&gt;          &lt;dbl&gt;        &lt;dbl&gt;       &lt;dbl&gt;\n1         200          1027.       10550.     619072.\n\n\n\n\n\nFigure 3: Summary of BC Large Fire Sizes by Year\n\n\n\n\n\n\n\n\n\n\nYear\nNumber of Fires\nMinimum Size(ha)\nMedian Size(ha)\nMean Size(ha)\nMaximum Size(ha)\n\n\n\n\n2022\n63\n203\n713.0\n2054.2\n34753.0\n\n\n2023\n219\n200\n1217.1\n12921.4\n619072.5\n\n\n2024\n100\n200\n1066.8\n10707.3\n508453.3\n\n\n\n\n\nFigure 4: Wildfire Sizes Box Plot by Year\nTable and a box plot. With median of 1027 and mean size of 10550, we can understand that it is strongly right-skewed.\n\n\nCode\nlarge_fires_bc |&gt;\n  ggplot(aes(\n    x = factor(YEAR),\n    y = SIZE_HA\n  )) +\n  geom_boxplot() +\n  scale_y_log10() +\n  labs(\n    title = \"Figure 4: Distribution of Large Fire Size in BC\",\n    x = \"Year\",\n    y = \"Fire size (hectares, log scale)\"\n  ) +\n  theme_minimal()\n\n\n\n\n\n\n\n\n\nThe logarithmic scaling is useful when there are both very large and very small values, squishing the large ones and spacing the small ones.\nSummary of Data: 382 BC large vegetation fire records (\\(\\geq\\) 200ha) from the Canadian National Fire Database for 2022-2024",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#inspect",
+    "href": "01-explore-data.html#inspect",
+    "title": "Exploring Data",
+    "section": "Inspect",
+    "text": "Inspect\nRepeating what was done for 2023 is tedious and unnecessary.\nFirst, load.\n\n\nCode\npm25_2022 &lt;- read_csv(\"data/raw/airquality/2022/data_2022.csv\")\n\nstations_2022 &lt;- read_csv(\"data/raw/airquality/2022/stations_2022.csv\")\n\npm25_2024 &lt;- read_csv(\"data/raw/airquality/2024/data_2024.csv\")\n\nstations_2024 &lt;- read_csv(\"data/raw/airquality/2024/stations_2024.csv\")\n\n\nSecond, check if the column names are same.\n\n\nCode\nidentical(names(pm25_2022), names(pm25_2023))\n\n\n[1] TRUE\n\n\nCode\nidentical(names(pm25_2023), names(pm25_2024))\n\n\n[1] TRUE\n\n\nCode\nidentical(names(stations_2022), names(stations_2023))\n\n\n[1] TRUE\n\n\nCode\nidentical(names(stations_2023), names(stations_2024))\n\n\n[1] TRUE\n\n\nThird, all three years together.\n\n\nCode\ntibble(\n  Year = c(2022, 2023, 2024),\n\n  PM25_Rows = c(\n    nrow(pm25_2022),\n    nrow(pm25_2023),\n    nrow(pm25_2024)\n  ),\n  \n  Stations_With_PM25 = c(\n    n_distinct(pm25_2022$NAPS_ID),\n    n_distinct(pm25_2023$NAPS_ID),\n    n_distinct(pm25_2024$NAPS_ID)\n  ),\n  \n  Stations_In_Metadata = c(\n    nrow(stations_2022),\n    nrow(stations_2023),\n    nrow(stations_2024)\n  )\n)\n\n\n# A tibble: 3 × 4\n   Year PM25_Rows Stations_With_PM25 Stations_In_Metadata\n  &lt;dbl&gt;     &lt;int&gt;              &lt;int&gt;                &lt;int&gt;\n1  2022    490560                 56                   56\n2  2023    481800                 55                   55\n3  2024    509472                 58                   58\n\n\nCode\npm25_missing_years &lt;- bind_rows(\n    pm25_2022 |&gt; mutate(Year = 2022),\n    pm25_2023 |&gt; mutate(Year = 2023),\n    pm25_2024 |&gt; mutate(Year = 2024)\n  ) |&gt;\n  group_by(Year) |&gt;\n  summarise(\n    observations = n(),\n    missing = sum(is.na(Concentration)),\n    percent_missing = mean(is.na(Concentration)) * 100\n  )\npm25_missing_years\n\n\n# A tibble: 3 × 4\n   Year observations missing percent_missing\n  &lt;dbl&gt;        &lt;int&gt;   &lt;int&gt;           &lt;dbl&gt;\n1  2022       490560   23720            4.84\n2  2023       481800   27784            5.77\n3  2024       509472   36818            7.23\n\n\nStations: 56 -&gt; 55 -&gt; 58 (changing number) Missing: 4.84 -&gt; 5.77 -&gt; 7.23 (growing)\nNote: 2024 is a leap year so it has much more rows\nFinal, combine.\n\n\nCode\npm25_all &lt;- bind_rows(\n  pm25_2022,\n  pm25_2023,\n  pm25_2024\n)",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#using-out_date",
+    "href": "01-explore-data.html#using-out_date",
+    "title": "Exploring Data",
+    "section": "Using OUT_DATE",
+    "text": "Using OUT_DATE\nCalculating the duration of the fire in days by finding the difference between reported dates of fire and the date the fire was put out.\n\n\nCode\n# calculate duration through OUT_DATE\nlarge_fires_bc |&gt;\n  filter(!is.na(OUT_DATE)) |&gt;\n  mutate(duration_days = as.numeric(difftime(OUT_DATE, REP_DATE, units = \"days\"))) |&gt;\n  summarise(\n    min_duration = min(duration_days),\n    median_duration = median(duration_days),\n    mean_duration = mean(duration_days),\n    max_duration = max(duration_days)\n  )\n\n\n# A tibble: 1 × 4\n  min_duration median_duration mean_duration max_duration\n         &lt;dbl&gt;           &lt;dbl&gt;         &lt;dbl&gt;        &lt;dbl&gt;\n1           -2            93.5          97.6          325\n\n\nThe min_duration of -2 shows that there are inconsistencies.\n\n\nCode\n# find out which row gives a duration days below 0\nlarge_fires_bc |&gt;\n  filter(!is.na(OUT_DATE)) |&gt;\n  mutate(duration_days = as.numeric(difftime(OUT_DATE, REP_DATE, units = \"days\"))) |&gt;\n  filter(duration_days &lt; 0) |&gt;\n  select(\n    NFDBFIREID,\n    FIRENAME,\n    REP_DATE,\n    OUT_DATE,\n    duration_days,\n    SIZE_HA,\n    MORE_INFO\n  )\n\n\n# A tibble: 1 × 7\n  NFDBFIREID      FIRENAME REP_DATE            OUT_DATE            duration_days\n  &lt;chr&gt;           &lt;chr&gt;    &lt;dttm&gt;              &lt;dttm&gt;                      &lt;dbl&gt;\n1 BC-2022-2022-G… &lt;NA&gt;     2022-05-31 00:00:00 2022-05-29 00:00:00            -2\n# ℹ 2 more variables: SIZE_HA &lt;dbl&gt;, MORE_INFO &lt;chr&gt;\n\n\nOnly one row. This can be treated as missing when cleaning data.\nFinding the PM2.5 data between REP_DATE and OUT_DATE is very crude and potentially treat a fire equally as day 2 as day 92.",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#using-rep_date-only",
+    "href": "01-explore-data.html#using-rep_date-only",
+    "title": "Exploring Data",
+    "section": "Using REP_DATE only",
+    "text": "Using REP_DATE only\nREP_DATE has no missing values making it more reliable.\nThis uses a recent-fire variable (to be created). It is going to check previous 7/14/30 days of air-quality stations and find any large fires within different perimeters in those days.\nThis is not looking for currently “active” fires like was told before.",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#air-quality-data",
+    "href": "01-explore-data.html#air-quality-data",
+    "title": "Exploring Data",
+    "section": "Air Quality Data",
+    "text": "Air Quality Data\n\nNAPS provides complete hourly station grids for each year\nPM2.5 measurement missingness ranges from 4.84% to 7.23% across 2022–2024\nMissingness varies substantially between monitoring stations and many appear in subsequent months\nExtreme PM2.5 values occur in sustained episodes",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#large-fire-data",
+    "href": "01-explore-data.html#large-fire-data",
+    "title": "Exploring Data",
+    "section": "Large Fire Data",
+    "text": "Large Fire Data\n\n382 BC large vegetation fire records available from 2022-2024\nFire size is strongly right-skewed\nFollowing provides non-usable information for BC 2022-2024 records: PRESECRIBED, ATTK_DATE, FIRE_TYPE\nOUT_DATE contains one inconsistent record that was found\nUse recent-fire windows based on Fire_Date to connect to PM2.5 date",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "01-explore-data.html#analysis-design",
+    "href": "01-explore-data.html#analysis-design",
+    "title": "Exploring Data",
+    "section": "Analysis Design",
+    "text": "Analysis Design\nOne monitoring station on one day with columns being:\n\nDate\nNAPS_ID\nStation_Name\nLatitude\nLongitude\nmean_pm25\nmax_pm25\nhours_observed\nrecent_fire_count_100km\nrecent_fire_count_250km\nrecent_fire_area_250km\nnearest_recent_fire_km\nYear\nMonth\n\nThese are the questions I have formed and will be answering:\n\nHow did daily PM2.5 differ between 2022-2024?\nCan we classify a station day as High-PM2.5 vs. Normal?\nCan recent large-fire proximity/activity help predict daily PM2.5?\nDo distinct types of station-days apppear naturally?",
+    "crumbs": [
+      "Data Exploration"
+    ]
+  },
+  {
+    "objectID": "03-eda.html",
+    "href": "03-eda.html",
+    "title": "Exploratory Data Analysis",
+    "section": "",
+    "text": "Eplores daily PM2.5 patterns in British Columbia from 2022–2024 and their relationship with recent large-fire activity.\nCode\n# load packages\nlibrary(tidyverse)\nlibrary(patchwork)\nCode\n# load processed analysis data\nanalysis_daily &lt;- read_csv(\n  \"data/processed/analysis_daily.csv\",\n  show_col_types = FALSE)\n\n# filter to only valid ones\nanalysis_valid &lt;- analysis_daily |&gt; filter(valid_day)\n\n# load large fires data\nlarge_fires_clean &lt;- read_csv(\n  \"data/processed/large_fires_clean.csv\",\n  show_col_types = FALSE\n)\n\ncase_study_fires &lt;- read_csv(\n  \"data/processed/case_study_fires.csv\",\n  show_col_types = FALSE\n)\nThe table below summarizes the most important variables used throughout the data-building and analysis workflow.\nKey variables used throughout the analysis\n\n\nAir Quality\nFire\nRelationship\n\n\n\n\nStation_Date\nFire_ID\ndays_since_fire\n\n\nYear\nFire_Year\nDistance_km\n\n\nMonth\nReport_Date\nfire_count_100km_{7/14/30}d\n\n\nNAPS_ID\nFire_Date\nfire_count_250km_{7/14/30}d\n\n\nStation_Name\nFire_Latitude\nfire_area_250km_{7/14/30}d\n\n\nLatitude\nFire_Longitude\nnearest_fire_km_{7/14/30}d\n\n\nLongitude\nSize_Ha\nrecent_fire_250km_14d\n\n\nmean_pm25\nCause\nfire_activity_250km_14d\n\n\nmax_pm25\nResponse\nfire_distance_group\n\n\nhours_observed\n\n\n\n\nvalid_day\n\n\n\n\nMonth_Name",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#what-did-a-typical-station-day-look-like-that-month",
+    "href": "03-eda.html#what-did-a-typical-station-day-look-like-that-month",
+    "title": "Exploratory Data Analysis",
+    "section": "2-1. What did a typical station day look like that month?",
+    "text": "2-1. What did a typical station day look like that month?\n\n\nCode\nmonthly_median_plot &lt;- monthly_pm25 |&gt;\n  ggplot(aes(x = Month, y = monthly_median_pm25, group = factor(Year), color = factor(Year))) +\n  geom_line() +\n  geom_point() +\n  scale_x_continuous(breaks = 1:12, labels = month.abb) +\n  labs(\n    title = \"Visualization 2: Typical Daily PM2.5 by Month\",\n    subtitle = \"Monthly median of station day mean PM2.5\",\n    x = \"Month\",\n    y = \"Median daily PM2.5 (µg/m^3)\",\n    color = \"Year\"\n  ) +\n  theme_minimal()\n\nmonthly_median_plot\n\n\n\n\n\nLine graph of a typical valid daily mean PM2.5 by month.\n\n\n\n\nTypical daily PM2.5 showed seasonal differences that varied by year. In all three years, the concentration was lower during spring. In 2022, the median increased sharply in the fall and peaked around October-November. In 2023, the line rose the most in late summer with August having the highest median. Compared to other two years, 2024 generally remained low increasing around the same point as 2023, late Summer, and peaking in August.\nOverall, every year has a particular season that is more concentrated than others, but that season is not identical every year. 2022 was around Aug-Nov while 2023 and 2024 were around Jul-Aug.",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#how-high-were-the-upper-tail-station-days-that-month",
+    "href": "03-eda.html#how-high-were-the-upper-tail-station-days-that-month",
+    "title": "Exploratory Data Analysis",
+    "section": "2-2. How high were the upper-tail station days that month?",
+    "text": "2-2. How high were the upper-tail station days that month?\n\n\nCode\nmonthly_p90_plot &lt;- monthly_pm25 |&gt;\n  ggplot(aes(x = Month, y = monthly_p90_pm25, group = factor(Year), color = factor(Year))) +\n  geom_line() +\n  geom_point() +\n  scale_x_continuous(breaks = 1:12, labels = month.abb) +\n  labs(\n    title = \"Visualization 3: 90th Percentile Daily PM2.5 by Month\",\n    x = \"Month\",\n    y = \"90th percentile PM2.5 µg/m^3)\",\n    color = \"Year\"\n  ) +\n  theme_minimal()\n\nmonthly_p90_plot\n\n\n\n\n\nLine graph of upper-tail valid daily mean PM2.5 by month.\n\n\n\n\nUpper-tail PM2.5 varied dramatically among the three years. August 2023 is very noticeable with its median value at a point far above any values. In 2022, the upper tail was highest during September-November. In 2024, the upper tail was generally lower and more stable.",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#combined-observation",
+    "href": "03-eda.html#combined-observation",
+    "title": "Exploratory Data Analysis",
+    "section": "Combined Observation",
+    "text": "Combined Observation\nSeasonal differences are strong in highly concentrated PM2.5 station-days than in typical ones.",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#how-many-large-fire-records-occurred-in-each-month-of-each-year",
+    "href": "03-eda.html#how-many-large-fire-records-occurred-in-each-month-of-each-year",
+    "title": "Exploratory Data Analysis",
+    "section": "3-1. How many large-fire records occurred in each month of each year?",
+    "text": "3-1. How many large-fire records occurred in each month of each year?\n\n\nCode\nmonthly_fires &lt;- large_fires_clean |&gt;\n  filter(!is.na(Fire_Date)) |&gt;\n  mutate(\n    Year = lubridate::year(Fire_Date),\n    Month = lubridate::month(Fire_Date)\n  ) |&gt;\n  count(Year, Month, name = \"large_fire_count\") |&gt;\n  tidyr::complete(\n    Year = 2022:2024,\n    Month = 1:12,\n    fill = list(large_fire_count = 0)\n  ) |&gt;\n  mutate(Month_Name = factor(month.abb[Month], levels = month.abb))\n\nmonthly_fires |&gt; slice_head(n = 10)\n\n\n# A tibble: 10 × 4\n    Year Month large_fire_count Month_Name\n   &lt;dbl&gt; &lt;dbl&gt;            &lt;int&gt; &lt;fct&gt;     \n 1  2022     1                0 Jan       \n 2  2022     2                0 Feb       \n 3  2022     3                0 Mar       \n 4  2022     4                0 Apr       \n 5  2022     5                1 May       \n 6  2022     6                6 Jun       \n 7  2022     7               11 Jul       \n 8  2022     8               31 Aug       \n 9  2022     9                7 Sep       \n10  2022    10                7 Oct",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#when-during-the-year-were-large-fires-most-frequently-recorded",
+    "href": "03-eda.html#when-during-the-year-were-large-fires-most-frequently-recorded",
+    "title": "Exploratory Data Analysis",
+    "section": "3-2. When during the year were large fires most frequently recorded?",
+    "text": "3-2. When during the year were large fires most frequently recorded?\n\n\nCode\nmonthly_fire_plot &lt;- monthly_fires |&gt;\n  ggplot(aes(x = Month, y = large_fire_count, group = factor(Year), color = factor(Year))) +\n  geom_line() +\n  geom_point() +\n  scale_x_continuous(breaks = 1:12, labels = month.abb) +\n  labs(\n    title = \"Visualization 4: Large Fire Records by Month\",\n    x = \"Month\",\n    y = \"Number of large-fire records\",\n    color = \"Year\"\n  ) +\n  theme_minimal()\n\nmonthly_fire_plot",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#comparing",
+    "href": "03-eda.html#comparing",
+    "title": "Exploratory Data Analysis",
+    "section": "Comparing",
+    "text": "Comparing\n\n\nCode\n(\n  monthly_median_plot + labs(title = \"Median PM2.5\", subtitle = \"\") | \n  monthly_p90_plot + labs(title = \"90th Percentile PM2.5\") | \n  monthly_fire_plot + labs(title = \"Large Fire Activities\")\n) +\n  plot_annotation(\n    title = \"Visualization 5: Comparing Median and 90th Percentile PM2.5 with Numer of Large Fire Activites\"\n  )\n\n\n\n\n\n\n\n\n\nLarge-fire activity and upper-tail PM2.5 show some temporal overlap. Large-fire records show a sharp rise in July 2023 close to the sharp peak of 90th percentile PM2.5 record in August 2023. However, this relationship is not consistent over years. In 2022, large-fire records show a peak around August while the highest point of upper-tail PM2.5 occurred later in September-November. In 2024, large-fire activity peaked in July but PM2.5 increased moderately in August.\nTherefore, monthly fire counts and high-PM2.5 periods have a weak relationship that cannot be fully explained only by the two. We will need to look into geographic and other factors.",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#are-pm2.5-concentrations-generally-different-when-there-has-been-at-least-one-recent-large-fire-within-250-km",
+    "href": "03-eda.html#are-pm2.5-concentrations-generally-different-when-there-has-been-at-least-one-recent-large-fire-within-250-km",
+    "title": "Exploratory Data Analysis",
+    "section": "4-1. Are PM2.5 concentrations generally different when there has been at least one recent large fire within 250 km?",
+    "text": "4-1. Are PM2.5 concentrations generally different when there has been at least one recent large fire within 250 km?\n\n\nCode\n# classify if the fire is within 250km in recent 14 days\nanalysis_valid &lt;- analysis_valid |&gt;\n  mutate(\n    recent_fire_250km_14d =\n      if_else(\n        fire_count_250km_14d &gt; 0,\n        \"At least one recent fire\",\n        \"No recent fire\"\n      )\n  )\n\n# distribution\nanalysis_valid |&gt;\n  group_by(recent_fire_250km_14d) |&gt;\n  summarise(\n    station_days = n(),\n    fire_mean_pm25 = mean(mean_pm25),\n    fire_median_pm25 = median(mean_pm25),\n    fire_p90_pm25 = quantile(mean_pm25, 0.90),\n    fire_p95_pm25 = quantile(mean_pm25, 0.95),\n    .groups = \"drop\"\n  )\n\n\n# A tibble: 2 × 6\n  recent_fire_250km_14d    station_days fire_mean_pm25 fire_median_pm25\n  &lt;chr&gt;                           &lt;int&gt;          &lt;dbl&gt;            &lt;dbl&gt;\n1 At least one recent fire        12774           9.03             5.46\n2 No recent fire                  45231           5.62             4.5 \n# ℹ 2 more variables: fire_p90_pm25 &lt;dbl&gt;, fire_p95_pm25 &lt;dbl&gt;\n\n\nThe four fire count categories will be as following: 0 fires, 1 fire, 2-5 fires, 6+ fires. The biggest populated number after 0 is 1 and 2-5 covers 75% of the data. Then 6+ captures the upper quarter.\n\n\nCode\nrecent_near_fire_boxplot &lt;- analysis_valid |&gt;\n  ggplot(aes(x = recent_fire_250km_14d, y = mean_pm25)) +\n  geom_boxplot() +\n  coord_cartesian(ylim = c(0, 40)) +\n  labs(\n    title = \"Visualization 6: Daily Mean PM2.5 by Recent Nearby Large-Fire Activity\",\n    subtitle = \"Large fires within 250 km in recent 14 days\",\n    x = NULL,\n    y = \"Daily mean PM2.5 (µg/m^3)\"\n  ) +\n  theme_minimal()\n\nrecent_near_fire_boxplot\n\n\n\n\n\nDifference when at least one fire activity exists\n\n\n\n\nStation days with at least one large fire within 250km during the previous 14 days tended to have higher daily PM2.5 than station days none. Though the difference is small around the median, the distribution with fir activity has a larger upper qudrant. This shows that recent near fires may be more associated with high-PM2.5 records than just typical conditions.",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#how-much-recent-large-fire-activity-occurred-within-250-km-and-what-did-its-pm2.5-look-like",
+    "href": "03-eda.html#how-much-recent-large-fire-activity-occurred-within-250-km-and-what-did-its-pm2.5-look-like",
+    "title": "Exploratory Data Analysis",
+    "section": "4-2. How much recent large-fire activity occurred within 250 km and what did its PM2.5 look like?",
+    "text": "4-2. How much recent large-fire activity occurred within 250 km and what did its PM2.5 look like?\n\n\nCode\nanalysis_valid &lt;- analysis_valid |&gt;\n  mutate(\n    fire_activity_250km_14d = case_when(\n      fire_count_250km_14d == 0 ~ \"0 fires\",\n      fire_count_250km_14d == 1 ~ \"1 fire\",\n      fire_count_250km_14d &lt;= 5 ~ \"2–5 fires\",\n      fire_count_250km_14d &gt;= 6 ~ \"6+ fires\"\n    ),\n    \n    fire_activity_250km_14d = factor(\n      fire_activity_250km_14d,\n      levels = c(\n        \"0 fires\",\n        \"1 fire\",\n        \"2–5 fires\",\n        \"6+ fires\"\n      )\n    )\n  )\n\nanalysis_valid |&gt;\n  count(fire_activity_250km_14d)\n\n\n# A tibble: 4 × 2\n  fire_activity_250km_14d     n\n  &lt;fct&gt;                   &lt;int&gt;\n1 0 fires                 45231\n2 1 fire                   4732\n3 2–5 fires                5195\n4 6+ fires                 2847\n\n\n\n\nCode\nfire_activity_summary &lt;- analysis_valid |&gt;\n  group_by(fire_activity_250km_14d) |&gt;\n  summarise(\n    station_days = n(),\n    fire_mean_pm25 = mean(mean_pm25),\n    fire_median_pm25 = median(mean_pm25),\n    fire_p90_pm25 = quantile(mean_pm25, 0.90),\n    fire_p95_pm25 = quantile(mean_pm25, 0.95),\n    .groups = \"drop\"\n  )\n\nfire_activity_summary\n\n\n\n\nCode\nfire_activity_boxplot_full &lt;- analysis_valid |&gt;\n  ggplot(aes(x = fire_activity_250km_14d, y = mean_pm25)) +\n  geom_boxplot() +\n  labs(\n    title = \"Visualization 7: Daily PM2.5 by Recent Nearby Large-Fire Activity\",\n    subtitle = \"Large fires within 250 km during the previous 14 days\",\n    x = \"Recent large-fire activity\",\n    y = \"Daily mean PM2.5 (µg/m^3)\"\n  ) +\n  theme_minimal()\n\nfire_activity_boxplot_zoomed &lt;- analysis_valid |&gt;\n  ggplot(aes(x = fire_activity_250km_14d, y = mean_pm25)) +\n  geom_boxplot() +\n  coord_cartesian(ylim = c(0, 40)) +\n  labs(\n    title = \"Zoomed to 0–40 µg/m^3\",\n    x = \"Recent large-fire activity\",\n    y = \"Daily mean PM2.5 µg/m^3\"\n  ) +\n  theme_minimal()\n\nfire_activity_boxplot_full / fire_activity_boxplot_zoomed\n\n\n\n\n\n\n\n\n\nDaily mean PM2.5 generally increased with recent nearby large-fire activity. Mean PM2.5 rose from 5.62 µg/m^3 with no recent fires to 11.3 µg/m^3 with 6+ fires. However, the medians did not increase perfectly across every category. These observations indicate that the relationship is rather driven by high upper-tail PM2.5 data than a shift in the entire distribution.",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#kamloops",
+    "href": "03-eda.html#kamloops",
+    "title": "Exploratory Data Analysis",
+    "section": "Kamloops",
+    "text": "Kamloops\n\n\nCode\n# check Kamloops - Aug 21, 2023 data\nanalysis_valid |&gt;\n  filter(\n    Station_Date == as.Date(\"2023-08-21\"),\n    str_detect(Station_Name, \"KAMLOOPS\")\n  ) |&gt;\n  select(\n    Station_Date,\n    Station_Name,\n    mean_pm25,\n    max_pm25,\n    fire_count_100km_7d,\n    fire_count_100km_14d,\n    fire_count_250km_7d,\n    fire_count_250km_14d,\n    nearest_fire_km_7d,\n    nearest_fire_km_14d\n  )\n\n\n# A tibble: 1 × 10\n  Station_Date Station_Name               mean_pm25 max_pm25 fire_count_100km_7d\n  &lt;date&gt;       &lt;chr&gt;                          &lt;dbl&gt;    &lt;dbl&gt;               &lt;dbl&gt;\n1 2023-08-21   KAMLOOPS - FEDERAL BUILDI…      596.      982                   2\n# ℹ 5 more variables: fire_count_100km_14d &lt;dbl&gt;, fire_count_250km_7d &lt;dbl&gt;,\n#   fire_count_250km_14d &lt;dbl&gt;, nearest_fire_km_7d &lt;dbl&gt;,\n#   nearest_fire_km_14d &lt;dbl&gt;\n\n\nCode\n# show the fires within 250km and 14 days\ncase_study_fires |&gt;\n  filter(\n    Station_Date == as.Date(\"2023-08-21\"),\n    str_detect(Station_Name, \"KAMLOOPS\")\n  ) |&gt;\n  arrange(Distance_km) |&gt;\n  select(\n    Fire_ID,\n    Fire_Date,\n    days_since_fire,\n    Size_Ha,\n    Distance_km\n  )\n\n\n# A tibble: 6 × 5\n  Fire_ID             Fire_Date  days_since_fire Size_Ha Distance_km\n  &lt;chr&gt;               &lt;date&gt;               &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;\n1 BC-2023-2023-K42815 2023-08-18               3    373.        96.0\n2 BC-2023-2023-K52767 2023-08-15               6  13970.        98.8\n3 BC-2023-2023-K52808 2023-08-17               4    733        103. \n4 BC-2023-2023-K72705 2023-08-09              12   1016.       125. \n5 BC-2023-2023-K52813 2023-08-18               3   2044.       159. \n6 BC-2023-2023-V12722 2023-08-13               8   1518.       187. \n\n\nThe station recorded a daily mean PM2.5 of 596 µg/m^3 and an hourly maximum of 982 µg/m^3. Six large fires were located within 250 km of the station in the recent 14 days to date. The nearest was appx. 96 km away, even more two were within 100 km and seven days.",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "03-eda.html#fort-st.-john",
+    "href": "03-eda.html#fort-st.-john",
+    "title": "Exploratory Data Analysis",
+    "section": "Fort St. John",
+    "text": "Fort St. John\n\n\nCode\n# check Fort St. John - May 19, 2023 data\nanalysis_valid |&gt;\n  filter(\n    Station_Date == as.Date(\"2023-05-19\"),\n    str_detect(Station_Name, \"FORT ST. JOHN\")\n  ) |&gt;\n  select(\n    Station_Date,\n    Station_Name,\n    mean_pm25,\n    max_pm25,\n    fire_count_100km_7d,\n    fire_count_100km_14d,\n    fire_count_250km_7d,\n    fire_count_250km_14d,\n    nearest_fire_km_7d,\n    nearest_fire_km_14d\n  )\n\n\n# A tibble: 1 × 10\n  Station_Date Station_Name               mean_pm25 max_pm25 fire_count_100km_7d\n  &lt;date&gt;       &lt;chr&gt;                          &lt;dbl&gt;    &lt;dbl&gt;               &lt;dbl&gt;\n1 2023-05-19   FORT ST. JOHN - LEARNING …       461     2112                   1\n# ℹ 5 more variables: fire_count_100km_14d &lt;dbl&gt;, fire_count_250km_7d &lt;dbl&gt;,\n#   fire_count_250km_14d &lt;dbl&gt;, nearest_fire_km_7d &lt;dbl&gt;,\n#   nearest_fire_km_14d &lt;dbl&gt;\n\n\nCode\n# show the fires within 250km and 14 days\ncase_study_fires |&gt;\n  filter(\n    Station_Date == as.Date(\"2023-05-19\"),\n    str_detect(Station_Name, \"FORT ST. JOHN\")\n  ) |&gt;\n  arrange(Distance_km) |&gt;\n  select(\n    Fire_ID,\n    Fire_Date,\n    days_since_fire,\n    Size_Ha,\n    Distance_km\n  )\n\n\n# A tibble: 4 × 5\n  Fire_ID             Fire_Date  days_since_fire Size_Ha Distance_km\n  &lt;chr&gt;               &lt;date&gt;               &lt;dbl&gt;   &lt;dbl&gt;       &lt;dbl&gt;\n1 BC-2023-2023-G80223 2023-05-05              14   2947         30.1\n2 BC-2023-2023-G80291 2023-05-13               6  29506.        37.3\n3 BC-2023-2023-G80280 2023-05-12               7 619072.       168. \n4 BC-2023-2023-G90273 2023-05-11               8  42838.       212. \n\n\nThe station recorded a daily mean PM2.5 of 461 µg/m^3 and an hourly maximum of 2112 µg/m^3. Four large fires occurred within the 250 km and in 14 day window. The nearest was appx. 30 km away, while two were within 100 km during the previous 14 days.\nOverall, both extreme events case studies consistently align with the association we observed about recent-near fires and high PM2.5.",
+    "crumbs": [
+      "Exploratory Analysis"
+    ]
+  },
+  {
+    "objectID": "05-regression.html",
+    "href": "05-regression.html",
+    "title": "Regressions",
+    "section": "",
+    "text": "Code\nlibrary(tidyverse)\nlibrary(tidymodels)\nlibrary(patchwork)\nCode\nset.seed(555555)\n\nanalysis_valid &lt;- read_csv(\n  \"data/processed/analysis_valid.csv\",\n  show_col_types = FALSE\n)",
+    "crumbs": [
+      "Regression"
+    ]
+  },
+  {
+    "objectID": "05-regression.html#predictors",
+    "href": "05-regression.html#predictors",
+    "title": "Regressions",
+    "section": "Predictors",
+    "text": "Predictors\n\nnearest_fire_km_14d: how close was the nearest recent fire?\nfire_count_100km_7d: how much very nearby and very recent fires were there?\nfire_count_250km_14d: how much broader nearby fire activity was there?\n\nThis covers proximity, very local + very recent activities, and broader fire activities.\nIn other words it is essentially asking: Which historical station days had a similar combination of nearest fire distance, nearby recent fire count, and broader recent fire count, and what PM2.5 did those days experience?\n\n\nCode\nregression_data &lt;- analysis_valid |&gt;\n  select(\n    mean_pm25,\n    nearest_fire_km_14d,  \n    fire_count_100km_7d,\n    fire_count_250km_14d\n  )\n\n# Check for NA values\nregression_data |&gt; summarise(across(everything(), ~ sum(is.na(.x))))\n\n\n# A tibble: 1 × 4\n  mean_pm25 nearest_fire_km_14d fire_count_100km_7d fire_count_250km_14d\n      &lt;int&gt;               &lt;int&gt;               &lt;int&gt;                &lt;int&gt;\n1         0               35854                   0                    0\n\n\nCode\n# filter NA values in nearest_fire_km_14d\nnrow(regression_data)\n\n\n[1] 58005\n\n\nCode\nregression_data &lt;- analysis_valid |&gt;\n  filter(!is.na(nearest_fire_km_14d))\n\nnrow(regression_data)\n\n\n[1] 22151\n\n\n\nWill regression work better\nClassification threw away a lot of information making data analysis limited. However, regression retains the numerical data as is. Although this does not guarantee a good model, it seems to be better-fit for regression.\n\n\nProblem that might rise\nOur target is extremely right-skewed and that may lead to a very large RMSE.\nPlus, the predictors are still zero-heavy and the nearest fire in km within recent 14 days have many missing values. Due to lack of data, the regression might become unreliable.",
+    "crumbs": [
+      "Regression"
+    ]
+  },
+  {
+    "objectID": "05-regression.html#knn-regression",
+    "href": "05-regression.html#knn-regression",
+    "title": "Regressions",
+    "section": "KNN Regression",
+    "text": "KNN Regression\n\nTraining and testing sets\n\n\nCode\nset.seed(555555)\n\npm25_reg_split &lt;- initial_split(regression_data, prop = 0.75)\n\npm25_reg_train &lt;- training(pm25_reg_split)\npm25_reg_test &lt;- testing(pm25_reg_split)\n\n# Check\nnrow(pm25_reg_train)\nnrow(pm25_reg_test)\n\n\n\n\nRecipe\n\n\nCode\npm25_reg_recipe &lt;- recipe(mean_pm25 ~ nearest_fire_km_14d + fire_count_100km_7d + fire_count_250km_14d, data = pm25_reg_train) |&gt;\n  step_scale(all_predictors()) |&gt;\n  step_center(all_predictors())\n\n\n\n\nFive-fold cross-validation\n\n\nCode\nset.seed(555555)\n\npm25_reg_vfold &lt;- vfold_cv(pm25_reg_train, v = 5)\n\n\n\n\nKNN regression model\n\n\nCode\nknn_reg_spec &lt;- nearest_neighbor(weight_func = \"rectangular\", neighbors = tune()) |&gt;\n  set_engine(\"kknn\") |&gt;\n  set_mode(\"regression\")\n\n\n\n\nWorkflow\n\n\nCode\npm25_reg_workflow &lt;- workflow() |&gt;\n  add_recipe(pm25_reg_recipe) |&gt;\n  add_model(knn_reg_spec)\n\n\n\n\nTune K\nFirst Try\n\n\nCode\nk_reg_values &lt;- tibble(neighbors = seq(from = 1, to = 51, by = 2))\n\nset.seed(555555)\n\n# tuning results\n# pm25_reg_results &lt;- pm25_reg_workflow |&gt;\n#  tune_grid(\n#    resamples = pm25_reg_vfold,\n#    grid = k_reg_values,\n#    metrics = metric_set(rmse, mae, rsq)\n#  )\n\n# saving loaded data\n# saveRDS(\n#  pm25_reg_results,\n#  \"data/processed/pm25_knn_regression_tuning.rds\"\n# )\n\n# load previously saved data\npm25_reg_results &lt;- readRDS(\"data/processed/pm25_knn_regression_tuning.rds\")\n\n\n\n\nCode\nregression_rmse &lt;- pm25_reg_results |&gt;\n  collect_metrics() |&gt;\n  filter(.metric == \"rmse\")\n\nhead(regression_rmse)\n\n\n# A tibble: 6 × 7\n  neighbors .metric .estimator  mean     n std_err .config         \n      &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;           \n1         1 rmse    standard    15.4     5   1.58  pre0_mod01_post0\n2         3 rmse    standard    12.7     5   0.924 pre0_mod02_post0\n3         5 rmse    standard    12.5     5   0.912 pre0_mod03_post0\n4         7 rmse    standard    12.5     5   0.886 pre0_mod04_post0\n5         9 rmse    standard    12.6     5   0.854 pre0_mod05_post0\n6        11 rmse    standard    12.6     5   0.840 pre0_mod06_post0\n\n\nCode\nbest_reg_k &lt;- regression_rmse |&gt;\n  arrange(mean) |&gt;\n  slice(1) |&gt;\n  pull(neighbors)\n\nbest_reg_k\n\n\n[1] 7\n\n\n\n\nCode\nbest_reg_k_point &lt;- regression_rmse |&gt;\n  filter(neighbors == best_reg_k)\n\nrmse_vs_k &lt;- regression_rmse |&gt;\n  ggplot(aes(x = neighbors, y = mean)) +\n  geom_line() +\n  geom_point() +\n  geom_point(data = best_reg_k_point, size = 3) +\n  labs(\n    title = \"Cross-Validation RMSE Across K Values\",\n    subtitle = \"KNN regression using 5-fold cross-validation\",\n    x = \"Number of Neighbours (K)\",\n    y = \"RMSE\"\n  ) +\n  theme_minimal()\n\nrmse_vs_k\n\n\n\n\n\n\n\n\n\n\n\n[1] 6\n\n\n\n\n\n\n\n\n\n\n\nIn the broader graph, cross-validation RMSE decreased shraply as K increased from 1 reaching its lowest region around K = 4 to 10. RMSE, while slowly increasing, stabilized for larger K values.\nA refined search around K = 4 to 10 region identified K = 6 as the best value for the KNN regression model. Cross-validation RMSE decreased to it minimum at K = 6 and increased toward smaller and larger values.\n\n\nFinal KNN Regression\n\n\nCode\n# Final KNN model\nfinal_knn_reg_spec &lt;- nearest_neighbor(weight_func = \"rectangular\", neighbors = best_reg_k_refined) |&gt;\n  set_engine(\"kknn\") |&gt;\n  set_mode(\"regression\")\n\nfinal_pm25_reg_workflow &lt;- workflow() |&gt;\n  add_recipe(pm25_reg_recipe) |&gt;\n  add_model(final_knn_reg_spec)\n\nfinal_knn_reg_fit &lt;- final_pm25_reg_workflow |&gt;\n  fit(data = pm25_reg_train)\n\n\n\n\nCode\n# Test\npm25_reg_predictions &lt;- predict(final_knn_reg_fit, pm25_reg_test) |&gt;\n  bind_cols(pm25_reg_test)\n\npm25_reg_predictions |&gt; head()\n\n\n# A tibble: 6 × 30\n  .pred  Year Station_Date NAPS_ID Station_Name         City  Latitude Longitude\n  &lt;dbl&gt; &lt;dbl&gt; &lt;date&gt;         &lt;dbl&gt; &lt;chr&gt;                &lt;chr&gt;    &lt;dbl&gt;     &lt;dbl&gt;\n1  4.92  2022 2022-05-31    100103 NEW WESTMINSTER      METR…     49.2     -123.\n2  4.46  2022 2022-05-31    100128 RICHMOND - SOUTH     METR…     49.1     -123.\n3  4.71  2022 2022-05-31    100138 WEST VANCOUVER - HO… METR…     49.4     -123.\n4  4.21  2022 2022-05-31    100143 AGASSIZ - 7170 CHEA… AGAS…     49.2     -122.\n5  6.38  2022 2022-05-31    100308 COLWOOD - CITY HALL  COLW…     48.4     -123.\n6  6.37  2022 2022-05-31    101003 ABBOTSFORD - MILL L… ABBO…     49.0     -122.\n# ℹ 22 more variables: Elevation_m &lt;dbl&gt;, Site_Type &lt;chr&gt;, Urbanization &lt;chr&gt;,\n#   Land_Use &lt;chr&gt;, AQMS_Airzone &lt;chr&gt;, hours_observed &lt;dbl&gt;, mean_pm25 &lt;dbl&gt;,\n#   max_pm25 &lt;dbl&gt;, Month &lt;dbl&gt;, valid_day &lt;lgl&gt;, fire_count_100km_7d &lt;dbl&gt;,\n#   fire_count_100km_14d &lt;dbl&gt;, fire_count_100km_30d &lt;dbl&gt;,\n#   fire_count_250km_7d &lt;dbl&gt;, fire_count_250km_14d &lt;dbl&gt;,\n#   fire_count_250km_30d &lt;dbl&gt;, fire_area_250km_7d &lt;dbl&gt;,\n#   fire_area_250km_14d &lt;dbl&gt;, fire_area_250km_30d &lt;dbl&gt;, …\n\n\nMetrics\n\nRMSE: Calculates prediction error. Lower the better.\nR^2: How much of the variation the model explains. Higher the better (0-1)\nMAE: Calculates average absolute error. Lower the better.\n\n\n\nCode\n# RMSE, R^2, MAE values\nknn_reg_metrics &lt;- pm25_reg_predictions |&gt;\n  metrics(truth = mean_pm25, estimate = .pred)\n\nknn_reg_metrics\n\n\n# A tibble: 3 × 3\n  .metric .estimator .estimate\n  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;\n1 rmse    standard      10.5  \n2 rsq     standard       0.156\n3 mae     standard       4.42 \n\n\n\n\nCode\npredicted_actual_plot &lt;- pm25_reg_predictions |&gt;\n  ggplot(aes(x = mean_pm25, y = .pred)) +\n  geom_point(alpha = 0.3) +\n  geom_abline(slope = 1, intercept = 0, linetype = \"dashed\") +\n  labs(\n    title = \"KNN Regression: Predicted vs Actual Daily PM2.5\",\n    subtitle = paste(\"Final model with K =\", best_reg_k_refined),\n    x = \"Actual daily mean PM2.5 (µg/m^3)\",\n    y = \"Predicted daily mean PM2.5 (µg/m^3)\"\n  ) +\n  theme_minimal()\n\npredicted_actual_zoomed &lt;- pm25_reg_predictions |&gt;\n  ggplot(aes(x = mean_pm25, y = .pred)) +\n  geom_point(alpha = 0.3) +\n  geom_abline(slope = 1, intercept = 0, linetype = \"dashed\") +\n  coord_cartesian(xlim = c(0, 30), ylim = c(0, 30)) +\n  labs(\n    title = \"KNN Regression: Predicted vs Actual Daily PM2.5\",\n    subtitle = \"Zoomed to 0–30 µg/m^3\",\n    x = \"Actual daily mean PM2.5 (µg/m^3)\",\n    y = \"Predicted daily mean PM2.5 (µg/m^3)\"\n  ) +\n  theme_minimal()\n\npredicted_actual_plot | predicted_actual_zoomed",
+    "crumbs": [
+      "Regression"
+    ]
+  },
+  {
+    "objectID": "05-regression.html#analysis",
+    "href": "05-regression.html#analysis",
+    "title": "Regressions",
+    "section": "Analysis",
+    "text": "Analysis\nMAE = 4.42\nThis means the predictions differ from the actual daily mean PM2.5 by about 4.42 µg/m^3 on average.\nRMSE = 10.5\nBeing much larger than MAE suggests that there are some very large predictions errors. This can be found in the Predicted vs Actual plot where most observations are clustered near 0-30 but it doesn’t predict for the extreme PM2.5 values of 100+.\nR^2 = 0.156\nThe model explains about 15.6% of the variation in daily mean PM2.5. So proximity and recent fire counts did contain some useful information but most PM2.5 variation remains unexplained.\nThus, the regression model captured some relationship between recent wildfire conditions and daily PM2.5 but it has limitations. It particularly tends to greatly underpredict the extreme PM2.5 events.",
+    "crumbs": [
+      "Regression"
+    ]
+  },
+  {
+    "objectID": "05-regression.html#predictors-1",
+    "href": "05-regression.html#predictors-1",
+    "title": "Regressions",
+    "section": "Predictors",
+    "text": "Predictors\nKeep the same.",
+    "crumbs": [
+      "Regression"
+    ]
+  },
+  {
+    "objectID": "05-regression.html#linear-regression",
+    "href": "05-regression.html#linear-regression",
+    "title": "Regressions",
+    "section": "Linear Regression",
+    "text": "Linear Regression\n\n\nCode\n# without tuning\nlinear_reg_spec &lt;- linear_reg() |&gt;\n  set_engine(\"lm\")\n\nlinear_reg_recipe &lt;- recipe(\n  mean_pm25 ~\n    nearest_fire_km_14d +\n    fire_count_100km_7d +\n    fire_count_250km_14d,\n  data = pm25_reg_train\n)\n\nlinear_reg_workflow &lt;- workflow() |&gt;\n  add_recipe(linear_reg_recipe) |&gt;\n  add_model(linear_reg_spec)\n\nlinear_reg_fit &lt;- linear_reg_workflow |&gt;\n  fit(data = pm25_reg_train)\n\n# predict\nlinear_reg_predictions &lt;- predict(linear_reg_fit, pm25_reg_test) |&gt;\n  bind_cols(pm25_reg_test)\n\nlinear_reg_metrics &lt;- linear_reg_predictions |&gt;\n  metrics(truth = mean_pm25, estimate = .pred)\n\nlinear_reg_metrics\n\n\n# A tibble: 3 × 3\n  .metric .estimator .estimate\n  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;\n1 rmse    standard      10.3  \n2 rsq     standard       0.106\n3 mae     standard       4.82",
+    "crumbs": [
+      "Regression"
+    ]
+  },
+  {
+    "objectID": "07-learning-module.html",
+    "href": "07-learning-module.html",
+    "title": "Learning Module: Auditing Code",
+    "section": "",
+    "text": "This is a learning module derived from the two common mistakes I made across the files. It includes importance of going over tedious steps to verify the code works as intended and to validate the data in any datasets. (Includes AI Auditing)\nCode\nlibrary(tidyverse)\nCode\nanalysis_daily &lt;- read_csv(\"data/processed/analysis_daily.csv\")\n\nlarge_fires_clean &lt;- read_csv(\"data/processed/large_fires_clean.csv\", show_col_types = FALSE)",
+    "crumbs": [
+      "Learning Module"
+    ]
+  },
+  {
+    "objectID": "07-learning-module.html#ai-audit-1",
+    "href": "07-learning-module.html#ai-audit-1",
+    "title": "Learning Module: Auditing Code",
+    "section": "AI Audit 1",
+    "text": "AI Audit 1\nAn AI assistant says: Out_Date has no missing values, so it is safe to use directly to predictions.\nWhat is wrong with the reasoning?\n\n\n\n\n\n\nNoteGuided Answer\n\n\n\nThe AI checked completeness but did not check correctness.\nA better audit: 1. checking missing values 2. comparing Fire_Out_Year with the year in Out_Date 3. investigating inconsistent records 5. documenting corrections and unresolved records",
+    "crumbs": [
+      "Learning Module"
+    ]
+  },
+  {
+    "objectID": "07-learning-module.html#validate-against-a-known-observation",
+    "href": "07-learning-module.html#validate-against-a-known-observation",
+    "title": "Learning Module: Auditing Code",
+    "section": "Validate Against a Known Observation",
+    "text": "Validate Against a Known Observation\nOne useful way: compare it with a known observation from the raw dataset.\nDuring first exploration, it was noted that the Fort St. John station recorded a high hourly PM2.5 maximum of 2112 µg/m^3 on May 19, 20223.\nGiven the processed dataset:\n\n\nCode\nanalysis_daily |&gt;\n  filter(\n    Station_Date == as.Date(\"2023-05-19\"),\n    str_detect(Station_Name, \"FORT ST. JOHN\")\n  ) |&gt;\n  select(\n    Station_Date,\n    Station_Name,\n    mean_pm25,\n    max_pm25\n  )\n\n\n# A tibble: 1 × 4\n  Station_Date Station_Name                    mean_pm25 max_pm25\n  &lt;date&gt;       &lt;chr&gt;                               &lt;dbl&gt;    &lt;dbl&gt;\n1 2023-05-19   FORT ST. JOHN - LEARNING CENTRE       461     2112\n\n\nThe daily mean and hourly maximum should be different. If max_pm25 were equal to mean_pm25, that means the aggregation code needs to be inspected.\n\n\n\n\n\n\nImportantKey Lesson\n\n\n\nSuccessful execution does not gurantee a correct analysis\n\nCheck whether calculated values agree with known original observations",
+    "crumbs": [
+      "Learning Module"
+    ]
+  },
+  {
+    "objectID": "07-learning-module.html#ai-audit-2",
+    "href": "07-learning-module.html#ai-audit-2",
+    "title": "Learning Module: Auditing Code",
+    "section": "AI Audit 2",
+    "text": "AI Audit 2\nImagine a code was generated by an AI tool.\nWhich response is the safest?\nA. Trust the code because it ran error-free.\nB. Trust the code because the variable is named max_pm25\nC. Check whether the functions used actually match the intended calculations and validate the output against known observations.\nD. Remove unusually large PM2.5 values as they may be errors.\n\n\n\n\n\n\nNoteGuided Answer\n\n\n\nC\nSuccessful execution does not prove the code works as intended.\nAlways check the logic and compare outputs with previously known data.",
+    "crumbs": [
+      "Learning Module"
+    ]
+  }
+]
