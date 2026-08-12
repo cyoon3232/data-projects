@@ -38,23 +38,27 @@ Large-fire records were obtained from the Canadian National Fire Database (CNFD)
 
 
 ## Analysis Workflow
+### [01 Exploring Data](https://github.com/cyoon3232/data-projects/blob/main/bc-wildfire-analytics/01-explore-data.qmd)
 
-01-explore-data: explore and audit raw NAPS + wildfire data
+- Explore and audit raw NAPS + wildfire data
 
-02-build-analysis-data: hourly PM2.5 to day aggregation per station
+### [02 Build Analysis Data](https://github.com/cyoon3232/data-projects/blob/main/bc-wildfire-analytics/02-build-analysis-data.qmd)
 
-02-build-analysis-data: wildfire date auditing
+- Hourly PM2.5 to day aggregation per station
+- Wildfire date auditing
+- Geographic distance calculations
+- Combine air quality monitoring data and wildfire data with recent-fire features
 
-02-build-analysis-data: geographic distance calculations
+### [03 Exploratory Data Analysis](https://github.com/cyoon3232/data-projects/blob/main/bc-wildfire-analytics/03-eda.qmd)
 
-02-build-analysis-data: combine air quality monitoring data and wildfire data with recent-fire features
+### [04 KNN Classification](https://github.com/cyoon3232/data-projects/blob/main/bc-wildfire-analytics/04-knn-classification.qmd)
 
-03-eda: exploratory data analysis
+### [05 Regression](https://github.com/cyoon3232/data-projects/blob/main/bc-wildfire-analytics/05-regression.qmd)
 
-04-knn-classification: KNN classification
+- KNN + linear regression
 
-05-regression: KNN + linear regression
+### [06 K Means Clustering](https://github.com/cyoon3232/data-projects/blob/main/bc-wildfire-analytics/06-k-means-clustering.qmd)
 
-06-k-means-clustering: K means clustering
+### [07 Learning Module](https://github.com/cyoon3232/data-projects/blob/main/bc-wildfire-analytics/07-learning-module.qmd)
 
-07-learning-module: common mistakes turned to code-auditing module
+- Common mistakes turned to code-auditing module
