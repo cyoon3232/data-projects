@@ -1,5 +1,10 @@
 # Data Anlaysis: Wildfire Activity and PM2.5 in British Columbia
 
+## 🌐 View the Rendered Project
+
+[View the full Quarto website](https://cyoon3232.github.io/data-projects/02-build-analysis-data.html)
+
+# About
 An R and Quarto data anlaysis project.
 
 Preventing us from opening the window during sweltering summer days is the air pollutants from fire. How much of the air pollution do wildfires actually cause? Would we be able to predict them?
