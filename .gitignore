@@ -9,6 +9,8 @@
 *_cache/
 *_files/
 *.html
+_site/
+**/*.quarto_ipynb
 
 # VS Code
 .vscode/

@@ -1,0 +1,25 @@
+---
+title: "Can't Open Window On A Hot Summer Day"
+subtitle: "Exploring Wildfire Activity and PM2.5 in BC"
+---
+
+## About
+
+Preventing us from opening the window during sweltering summer days is the air pollutants from fire. How much of the air pollution do wildfires actually cause? Would we be able to predict them?
+
+Using R, this project explores the relationship between large wildfire activities and daily PM2.5 air pollutant concentration in British Columbia from 2022-2024.
+
+It combines hourly air quality data monitored by stations from NAPS and large fire records from CNFD. 
+
+## Key Findings
+
+- Recent nearby large fire activity was associated with higher daily PM2.5 but the relationship was not sufficient for strong prediction :(
+- A KNN classifier performed terribly despite high recall
+- KNN and linear regression captured only a limited portion of PM2.5 variation
+- K-means clustering identified several distint combinations of wildfire exposure and air-quality conditions
+
+## Educational Component
+
+The final learning module shows the two common errors the author encountered during the project.
+
+Use the sidebar to explore!!

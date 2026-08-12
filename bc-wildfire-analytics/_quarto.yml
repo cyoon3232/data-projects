@@ -1,0 +1,31 @@
+project:
+  type: website
+
+website: 
+  title: "Can't Open Window On A Hot Summer Day"
+  sidebar:
+    style: "docked"
+    contents:
+      - href: index.qmd
+        text: Home
+      - href: 01-explore-data.qmd
+        text: Data Exploration
+      - href: 02-build-analysis-data.qmd
+        text: Building the Dataset
+      - href: 03-eda.qmd
+        text: Exploratory Analysis
+      - href: 04-knn-classification.qmd
+        text: KNN Classification
+      - href: 05-regression.qmd
+        text: Regression
+      - href: 06-k-means-clustering.qmd
+        text: K-Means Clustering
+      - href: 07-learning-module.qmd
+        text: Learning Module
+
+format:
+  html:
+    toc: true
+    code-fold: true
+    code-tools: true
+    theme: cosmo
