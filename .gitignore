@@ -20,4 +20,7 @@ _site/
 Thumbs.db
 
 # BC Wildfire Analytics - large raw datasets
-/bc-wildfire-analytics/data/raw/
+/bc-wildfire-analytics/data/raw
+
+# Vancouver Crime Analytics - large raw datasets
+/vancouver-crime-analytics/data/raw
